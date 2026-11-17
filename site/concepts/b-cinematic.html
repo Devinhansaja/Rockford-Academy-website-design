@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept B · Cinematic Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#14243B;--deep:#070E19;--gold:#D9A441;--gold2:#F4D08A;--blue:#234B73}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:var(--deep);color:#fff;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.tag{position:fixed;left:16px;bottom:16px;z-index:99;background:var(--gold);color:var(--deep);font:700 12px Inter;padding:8px 14px;border-radius:99px}
+nav{position:fixed;inset:0 0 auto;z-index:50;display:flex;align-items:center;gap:32px;padding:24px max(24px,4vw)}
+nav b{font:500 15px Inter;letter-spacing:.32em}
+nav ul{display:flex;gap:28px;list-style:none;margin-left:auto;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+nav a.btn{padding:11px 20px;border:1px solid rgba(255,255,255,.4);border-radius:99px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;backdrop-filter:blur(8px)}
+/* HERO: full-bleed photo */
+.hero{position:relative;height:100vh;min-height:640px;display:flex;align-items:flex-end;padding:0 max(24px,4vw) 90px;overflow:hidden}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;transform:scale(1.12);animation:kb 18s ease-out forwards}
+@keyframes kb{to{transform:scale(1)}}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,14,25,.55) 0%,rgba(7,14,25,.15) 35%,rgba(7,14,25,.92) 100%)}
+.hero .in{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:1fr auto;align-items:end;gap:40px}
+.eyebrow{display:flex;align-items:center;gap:14px;font:500 12px Inter;letter-spacing:.3em;text-transform:uppercase;color:var(--gold2);margin-bottom:22px}
+.eyebrow::before{content:"";width:48px;height:1px;background:var(--gold)}
+h1{font:400 clamp(3.4rem,9vw,9.5rem)/.9 'Instrument Serif',serif;letter-spacing:-.02em}
+h1 i{font-style:italic;background:linear-gradient(100deg,var(--gold2),var(--gold) 50%,#fff 75%,var(--gold));background-size:250%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 7s linear infinite}
+@keyframes sheen{to{background-position:250%}}
+h1 .w{display:inline-block;opacity:0;transform:translateY(40px);filter:blur(10px);animation:up 1.2s cubic-bezier(.2,.7,.1,1) forwards}
+@keyframes up{to{opacity:1;transform:none;filter:none}}
+.side{max-width:340px;font-size:15px;line-height:1.7;color:rgba(255,255,255,.8);padding-bottom:12px}
+.side a{display:inline-flex;margin-top:22px;gap:12px;align-items:center;padding:16px 26px;background:var(--gold);color:var(--deep);border-radius:99px;font-weight:600;transition:gap .3s}
+.side a:hover{gap:20px}
+.scroll{position:absolute;z-index:3;left:50%;bottom:24px;width:1px;height:60px;background:rgba(255,255,255,.25);overflow:hidden}
+.scroll::after{content:"";position:absolute;inset:0 0 auto;height:40%;background:var(--gold);animation:sc 2s ease-in-out infinite}
+@keyframes sc{from{transform:translateY(-100%)}to{transform:translateY(260%)}}
+/* STATEMENT */
+.statement{padding:160px max(24px,4vw);display:grid;grid-template-columns:1fr 2fr;gap:40px;border-bottom:1px solid rgba(255,255,255,.08)}
+.statement small{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold2)}
+.statement p{font:400 clamp(2rem,4.4vw,4.2rem)/1.1 'Instrument Serif',serif}
+.statement p em{color:var(--gold)}
+/* GLOW CARDS */
+.cards{padding:120px max(24px,4vw);display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.08)}
+.gc{position:relative;padding:44px 36px;background:var(--deep);min-height:320px;overflow:hidden;transition:background .5s}
+.gc::before{content:"";position:absolute;inset:-1px;background:radial-gradient(400px circle at 50% 0%,rgba(217,164,65,.25),transparent 60%);opacity:0;transition:opacity .5s}
+.gc:hover::before{opacity:1}
+.gc span{font:400 64px/1 'Instrument Serif';color:var(--gold)}
+.gc h3{margin-top:60px;font:500 22px/1.25 Inter}
+.gc p{margin-top:10px;color:rgba(255,255,255,.6);font-size:14.5px}
+/* SPLIT PHOTO */
+.split{display:grid;grid-template-columns:1fr 1fr;min-height:90vh}
+.split img{width:100%;height:100%;object-fit:cover}
+.split .t{padding:120px max(24px,5vw);display:flex;flex-direction:column;justify-content:center;background:linear-gradient(160deg,var(--navy),var(--deep))}
+.split h2{font:400 clamp(2.6rem,5vw,5rem)/1 'Instrument Serif'}
+.split h2 i{color:var(--gold)}
+.split p{margin:24px 0 34px;color:rgba(255,255,255,.75);max-width:440px;line-height:1.7}
+.split a{align-self:flex-start;padding:16px 26px;border:1px solid var(--gold);border-radius:99px;color:var(--gold2);transition:background .3s,color .3s}
+.split a:hover{background:var(--gold);color:var(--deep)}
+@media(max-width:900px){.hero .in,.statement,.split{grid-template-columns:1fr}.cards{grid-template-columns:1fr}nav ul{display:none}}
+</style></head><body>
+<span class="tag">Concept B · Cinematic Premium</span>
+<nav><b>ROCKFORD</b><ul><li>About</li><li>Programmes</li><li>Approach</li><li>Careers</li><li>Contact</li></ul><a class="btn" href="#">Get in touch</a></nav>
+<section class="hero">
+  <img src="https://images.unsplash.com/photo-1549057446-9f5c6ac91a04?auto=format&fit=crop&w=2000&q=70" alt="">
+  <div class="in">
+    <div><p class="eyebrow">Rockford Academy · Sri Lanka</p>
+      <h1><span class="w">Beyond</span> <span class="w" style="animation-delay:.1s">English.</span><br><span class="w" style="animation-delay:.25s">Beyond</span> <span class="w" style="animation-delay:.35s">the</span> <i class="w" style="animation-delay:.45s">classroom.</i></h1></div>
+    <div class="side">Preparing young people for the opportunities of tomorrow through communication, confidence and personal development.<br><a href="#">Explore programmes →</a></div>
+  </div>
+  <div class="scroll"></div>
+</section>
+<section class="statement"><small>Our purpose</small><p>The world needs more than qualifications. It needs confident thinkers, <em>effective communicators</em> and people ready for every opportunity.</p></section>
+<section class="cards">
+  <div class="gc"><span>i.</span><h3>Spoken English &amp; Communication</h3><p>Find your voice.</p></div>
+  <div class="gc"><span>ii.</span><h3>Confidence &amp; Self-Expression</h3><p>Express yourself with clarity.</p></div>
+  <div class="gc"><span>iii.</span><h3>Personality &amp; Interpersonal Skills</h3><p>Build meaningful connections.</p></div>
+  <div class="gc"><span>iv.</span><h3>Critical Thinking &amp; Problem-Solving</h3><p>Think beyond the obvious.</p></div>
+  <div class="gc"><span>v.</span><h3>Professional &amp; Workplace Readiness</h3><p>Prepare for the real world.</p></div>
+  <div class="gc"><span>vi.</span><h3>Digital &amp; Future Readiness</h3><p>Adapt to a changing world.</p></div>
+</section>
+<section class="split"><img src="https://images.unsplash.com/photo-1715610258704-e8f9f5710fe0?auto=format&fit=crop&w=1400&q=70" alt="">
+  <div class="t"><h2>Help shape the <i>next generation.</i></h2><p>Join a team committed to preparing young people for a world of opportunity.</p><a href="#">Explore careers →</a></div></section>
+</body></html>

@@ -1,0 +1,16 @@
+{
+  "name": "rockford-academy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rockford Academy website and content management system. Zero external dependencies (Node.js 22.13+ built-ins only).",
+  "main": "server.js",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "create-admin": "node scripts/create-admin.js",
+    "backup": "node scripts/backup.js",
+    "test": "node --test --test-concurrency=1 \"tests/*.test.js\""
+  },
+  "license": "UNLICENSED"
+}

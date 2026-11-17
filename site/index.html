@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rockford Academy — Beyond English. Beyond the Classroom.</title>
+  <meta name="description" content="Rockford Academy prepares young people in Sri Lanka for the opportunities of tomorrow through communication, confidence and personal development.">
+  <meta name="theme-color" content="#14243B">
+  <!-- Canonical + og:url are added once the production domain is confirmed. -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Rockford Academy">
+  <meta property="og:title" content="Rockford Academy — Beyond English. Beyond the Classroom.">
+  <meta property="og:description" content="Preparing young people for the opportunities of tomorrow through communication, confidence and personal development.">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Concept only: production self-hosts woff2 subsets of these families. -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/main.css?v=11">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "name": "Rockford Academy",
+    "slogan": "Preparing people for opportunity.",
+    "description": "A youth development and communication academy in Sri Lanka.",
+    "areaServed": { "@type": "Country", "name": "Sri Lanka" }
+  }
+  </script>
+  <script>
+    /* Intro animation: set before first paint; skipped for reduced motion. Fallback reveal after 2.5s. */
+    (function (d) {
+      if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      d.classList.add('intro');
+      setTimeout(function () { d.classList.add('intro-play'); }, 2500);
+    })(document.documentElement);
+  </script>
+  <script src="assets/js/site-data.js?v=11" defer></script>
+  <script src="assets/js/main.js?v=11" defer></script>
+</head>
+<body class="show-notes">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- 01 · NAVIGATION: navy bar, logo in a white tab -->
+  <header class="site-header" id="top" data-header>
+    <div class="site-header__inner">
+      <a class="logo-tab" href="./" aria-label="Rockford Academy — home">
+        <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M20 3H3v26h26V12" fill="none" stroke="currentColor" stroke-width="2.4"/>
+          <path d="M24 3h5v5" fill="none" stroke="var(--rf-gold)" stroke-width="2.4"/>
+        </svg>
+        <span class="logo__type"><span class="logo__name">Rockford</span><span class="logo__sub">Academy</span></span>
+      </a>
+
+      <nav class="primary-nav" aria-label="Primary">
+        <ul>
+          <li><a href="./" aria-current="page">Home</a></li>
+          <li><a href="/about/" data-planned>About</a></li>
+          <li><a href="/programmes/" data-planned>Programmes</a></li>
+          <li><a href="/our-approach/" data-planned>Our Approach</a></li>
+          <li><a href="/careers/" data-planned>Careers</a></li>
+          <li><a href="/contact/" data-planned>Contact</a></li>
+        </ul>
+      </nav>
+
+      <a class="pill-btn pill-btn--gold site-header__cta" href="/contact/" data-planned data-track="cta_get_in_touch">Get in touch</a>
+
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+        <span class="menu-toggle__label">Menu</span>
+        <span class="menu-toggle__icon" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu" hidden data-mobile-menu>
+      <nav aria-label="Mobile">
+        <ol class="mobile-menu__list">
+          <li><a href="./"><span>/01</span>Home</a></li>
+          <li><a href="/about/" data-planned><span>/02</span>About</a></li>
+          <li><a href="/programmes/" data-planned><span>/03</span>Programmes</a></li>
+          <li><a href="/our-approach/" data-planned><span>/04</span>Our Approach</a></li>
+          <li><a href="/careers/" data-planned><span>/05</span>Careers</a></li>
+          <li><a href="/contact/" data-planned><span>/06</span>Contact</a></li>
+        </ol>
+        <a class="pill-btn pill-btn--gold mobile-menu__cta" href="/contact/" data-planned>Get in touch</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- 02 · HERO: navy frame, full photo, title in a cut-in tab -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__frame">
+        <figure class="ph ph--hero" data-img="hero" data-video-src="" data-video-poster="">
+          <div class="ph__art" aria-hidden="true"></div>
+          <figcaption class="ph__note note">
+            <strong>Placeholder image</strong>
+            Direction: a confident young Sri Lankan adult walking with notes and coffee, natural daylight, architectural background. Supports an optional muted video with pause control.
+          </figcaption>
+        </figure>
+
+        <div class="hero__tab">
+          <h1 class="hero__title" id="hero-title">
+            <span class="line"><span class="line__inner">Beyond English.</span></span>
+            <span class="line"><span class="line__inner">Beyond the Classroom.</span></span>
+          </h1>
+          <p class="hero__sub reveal" style="--d:.4s">Preparing young people for the opportunities of tomorrow through communication, confidence and personal development.</p>
+        </div>
+
+        <div class="hero__actions reveal" style="--d:.6s">
+          <a class="pill-btn pill-btn--gold" href="#programmes" data-track="cta_explore_programmes">Explore our programmes ↗</a>
+          <a class="pill-btn pill-btn--light" href="#about">Discover Rockford</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 · ABOUT: navy, small label left, statement right, staggered photos -->
+    <section class="about" id="about" aria-labelledby="about-title">
+      <div class="wrap">
+        <div class="lead-row">
+          <p class="tiny-label">About Rockford</p>
+          <div>
+            <h2 class="statement" id="about-title" data-split>The world needs more than qualifications; it needs people ready for opportunity.</h2>
+            <p class="lead-row__text reveal">It needs confident thinkers, effective communicators and capable leaders. Rockford exists to help develop that generation.</p>
+          </div>
+        </div>
+
+        <ul class="stagger" data-gallery aria-label="The learning environment"></ul>
+        <p class="note note--block note--dark">Learning environment photos are CMS-managed. Placeholders stand in until authentic Rockford photography is available and are never presented as actual facilities or students.</p>
+      </div>
+      <svg class="script-deco" viewBox="0 0 300 300" aria-hidden="true"><path d="M40 220c40-120 120-170 160-150s-10 110-70 120-60-60 10-110 140-20 120 60" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+    </section>
+
+    <!-- 04 · WHAT WE DEVELOP: light, slash tabs, outlined card carousel -->
+    <section class="develop surface-light" id="dimensions" aria-labelledby="dimensions-title">
+      <div class="wrap">
+        <h2 class="big-title reveal" id="dimensions-title">What we develop</h2>
+        <p class="caps-sub reveal">Six connected areas of development woven through every Rockford experience. English is the starting point, not the finish line.</p>
+
+        <div class="slash-tabs" role="group" aria-label="Filter development areas" data-dim-tabs>
+          <button type="button" aria-pressed="true" data-dim-filter="all">/All</button>
+          <button type="button" aria-pressed="false" data-dim-filter="personal">/Personal</button>
+          <button type="button" aria-pressed="false" data-dim-filter="professional">/Professional</button>
+          <button type="button" aria-pressed="false" data-dim-filter="future">/Future</button>
+        </div>
+
+        <div class="carousel">
+          <ol class="carousel__track" data-carousel tabindex="0" aria-label="Development areas">
+            <li class="o-card" data-group="personal"><h3 class="o-card__title">English &amp; Communication</h3><p class="o-card__text">Find your voice.</p><span class="o-card__pill">/Personal</span><span class="circle-arrow" aria-hidden="true">→</span></li>
+            <li class="o-card" data-group="personal"><h3 class="o-card__title">Confidence &amp; Self-Expression</h3><p class="o-card__text">Express yourself with clarity.</p><span class="o-card__pill">/Personal</span><span class="circle-arrow" aria-hidden="true">→</span></li>
+            <li class="o-card" data-group="personal"><h3 class="o-card__title">Personality &amp; Interpersonal Skills</h3><p class="o-card__text">Build meaningful connections.</p><span class="o-card__pill">/Personal</span><span class="circle-arrow" aria-hidden="true">→</span></li>
+            <li class="o-card" data-group="professional"><h3 class="o-card__title">Critical Thinking &amp; Problem-Solving</h3><p class="o-card__text">Think beyond the obvious.</p><span class="o-card__pill">/Professional</span><span class="circle-arrow" aria-hidden="true">→</span></li>
+            <li class="o-card" data-group="professional"><h3 class="o-card__title">Professional &amp; Workplace Readiness</h3><p class="o-card__text">Prepare for the real world.</p><span class="o-card__pill">/Professional</span><span class="circle-arrow" aria-hidden="true">→</span></li>
+            <li class="o-card" data-group="future"><h3 class="o-card__title">Digital Awareness &amp; Future Readiness</h3><p class="o-card__text">Adapt to a changing world.</p><span class="o-card__pill">/Future</span><span class="circle-arrow" aria-hidden="true">→</span></li>
+          </ol>
+          <div class="carousel__nav">
+            <button type="button" class="circle-arrow circle-arrow--btn" data-carousel-prev aria-label="Previous">←</button>
+            <button type="button" class="circle-arrow circle-arrow--btn" data-carousel-next aria-label="Next">→</button>
+          </div>
+        </div>
+        <p class="note note--block">Development areas, not six separate courses. The Personal / Professional / Future grouping is a presentation proposal for approval.</p>
+      </div>
+    </section>
+
+    <!-- 05 · JOURNEY: steel-blue rounded panel, alternating photo/text cards -->
+    <section class="journey-wrap" aria-labelledby="journey-title">
+      <div class="blue-panel">
+        <div class="lead-row">
+          <p class="tiny-label tiny-label--light">The Rockford journey</p>
+          <h2 class="statement" id="journey-title" data-split>From discovering your potential to transforming your future.</h2>
+        </div>
+
+        <div class="alt-grid">
+          <div class="alt-photo reveal"><div class="ph" data-img="journey1"><div class="ph__art" aria-hidden="true"></div></div><p class="ph__note note"><strong>Placeholder</strong> Learners in a lively group discussion.</p></div>
+          <article class="alt-card reveal"><span class="pill">Step 01</span><h3>Discover</h3><p>Discover your potential, your strengths and the direction you want to grow in.</p></article>
+          <article class="alt-card reveal"><span class="pill">Step 02</span><h3>Develop</h3><p>Develop essential capabilities in communication, confidence and critical thinking.</p></article>
+          <div class="alt-photo reveal"><div class="ph" data-img="journey2"><div class="ph__art" aria-hidden="true"></div></div><p class="ph__note note"><strong>Placeholder</strong> A learner presenting confidently to peers.</p></div>
+          <div class="alt-photo reveal"><div class="ph" data-img="journey3"><div class="ph__art" aria-hidden="true"></div></div><p class="ph__note note"><strong>Placeholder</strong> Role-play of a workplace conversation.</p></div>
+          <article class="alt-card reveal"><span class="pill">Step 03</span><h3>Practise</h3><p>Practise through real-world experiences: discussions, presentations and role-play.</p></article>
+          <article class="alt-card alt-card--wide reveal"><span class="pill pill--gold">Step 04</span><h3>Transform</h3><p>Transform the way you approach opportunities in education, employment and life.</p></article>
+        </div>
+        <div class="center-row">
+          <a class="pill-btn pill-btn--outline-light" href="/our-approach/" data-planned>See our approach ↗</a>
+        </div>
+        <p class="note note--block note--dark">Proposed storytelling framework, awaiting approval from Rockford Academy.</p>
+      </div>
+    </section>
+
+    <!-- 06 · FIGURES STRIP (serif numerals, factual only) -->
+    <section class="figures" aria-label="Rockford at a glance">
+      <div class="wrap figures__row">
+        <div class="figure"><p class="figure__big"><span>06</span> Development areas</p><p class="figure__small">Communication, confidence, personality, critical thinking, workplace and future readiness.</p></div>
+        <div class="figure"><p class="figure__big"><span>04</span> Journey stages</p><p class="figure__small">Discover, develop, practise and transform.</p></div>
+        <div class="figure"><p class="figure__big"><span>01</span> Promise</p><p class="figure__small">Preparing people for opportunity.</p></div>
+      </div>
+      <p class="note note--block wrap">No enrolment numbers, ratios or success rates are shown until Rockford has verified figures to publish.</p>
+    </section>
+
+    <!-- 07 · THE ROCKFORD DIFFERENCE: deep navy, line fan, full-width photo -->
+    <section class="difference" id="difference" aria-labelledby="difference-title">
+      <div class="wrap difference__top">
+        <svg class="fan" viewBox="0 0 240 240" aria-hidden="true" data-fan></svg>
+        <div class="lead-row">
+          <p class="tiny-label tiny-label--light">The Rockford difference</p>
+          <div>
+            <h2 class="statement" id="difference-title" data-split>Learning designed for life.</h2>
+            <p class="caps-sub caps-sub--light reveal">Real-world communication, interactive learning and confidence through participation.</p>
+          </div>
+        </div>
+      </div>
+      <div class="difference__photo"><div class="ph" data-img="difference"><div class="ph__art"></div></div><p class="ph__note note"><strong>Placeholder image</strong> Direction: three young adults walking and talking outdoors, candid and confident.</p></div>
+      <div class="wrap">
+        <ol class="principles">
+          <li class="reveal"><span>/01</span><h3>Real-world communication</h3><p>Conversations, interviews and presentations modelled on real situations.</p></li>
+          <li class="reveal"><span>/02</span><h3>Interactive learning</h3><p>Discussion and activity rather than lectures and memorisation.</p></li>
+          <li class="reveal"><span>/03</span><h3>Practical experiences</h3><p>Skills practised and reflected on until they feel natural.</p></li>
+          <li class="reveal"><span>/04</span><h3>Personal development</h3><p>Character, self-awareness and self-belief alongside language.</p></li>
+          <li class="reveal"><span>/05</span><h3>Collaborative activities</h3><p>Teamwork, debate and shared problem-solving.</p></li>
+          <li class="reveal"><span>/06</span><h3>Confidence through participation</h3><p>Every learner speaks, contributes and leads.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 08 · PROGRAMMES: white, big heading, photo cards (CMS) -->
+    <section class="programmes" id="programmes" aria-labelledby="programmes-title">
+      <div class="wrap">
+        <div class="head-split">
+          <h2 class="big-title reveal" id="programmes-title">Find the future<br>you want to build</h2>
+          <p class="caps-sub reveal">Programmes for school leavers, young adults and young professionals. Details are published here as soon as they are confirmed.</p>
+        </div>
+        <div class="filters slash-tabs" data-programme-filters hidden></div>
+        <div class="programme-grid" data-programme-grid aria-live="polite"></div>
+
+        <template id="tpl-programmes-empty">
+          <div class="pub-grid">
+            <article class="pub-card">
+              <div class="pub-card__media"><div class="ph" data-img="programmes"><div class="ph__art" aria-hidden="true"></div></div></div>
+              <span class="pill pill--outline">/Coming soon</span>
+              <h3 class="pub-card__title">Our first programmes are being designed now</h3>
+              <p class="pub-card__text">Programme details will be published here once they are confirmed.</p>
+            </article>
+            <article class="pub-card pub-card--cta">
+              <h3 class="pub-card__title">Be the first to know when enrolment opens</h3>
+              <p class="pub-card__text">Leave your details and we will contact you as soon as programmes are announced.</p>
+              <a class="pill-btn pill-btn--navy" href="/contact/?topic=programmes" data-planned data-track="programme_interest">Register your interest ↗</a>
+            </article>
+          </div>
+          <p class="note note--block">CMS state: no published programmes. Add <code>?demo=1</code> to the URL to preview programme cards with sample data.</p>
+        </template>
+      </div>
+    </section>
+
+    <!-- 09 · STORIES (hidden until approved testimonials exist) -->
+    <section class="stories" id="stories" aria-labelledby="stories-title" hidden data-stories>
+      <div class="wrap">
+        <p class="tiny-label tiny-label--gold">Testimonials</p>
+        <h2 class="serif-title" id="stories-title">Learner <em>stories</em></h2>
+        <div class="stories__list" data-stories-list></div>
+      </div>
+    </section>
+    <div class="note note--strip" data-stories-note>Testimonials section (black, serif "Learner stories" heading, white quote cards) is hidden. It appears automatically once approved testimonials with written consent are published.</div>
+
+    <!-- 10 · CAREERS: light, label + side list, cards grid, line fan -->
+    <section class="careers surface-light" id="careers" aria-labelledby="careers-title">
+      <svg class="fan fan--corner" viewBox="0 0 240 240" aria-hidden="true" data-fan></svg>
+      <div class="wrap careers__grid">
+        <aside class="careers__side">
+          <p class="tiny-label">Careers</p>
+          <ul class="side-list">
+            <li><a href="#careers" aria-current="true">/Open positions</a></li>
+            <li><a href="/careers/" data-planned>/Why Rockford</a></li>
+            <li><a href="/careers/" data-planned>/How to apply</a></li>
+          </ul>
+        </aside>
+        <div>
+          <h2 class="big-title" id="careers-title" data-split>Help shape the next generation</h2>
+          <p class="caps-sub reveal">Join a team committed to preparing young people for a world of opportunity.</p>
+          <ul class="vacancies" data-vacancies aria-live="polite"></ul>
+          <a class="pill-btn pill-btn--navy" href="/careers/" data-planned data-track="cta_explore_careers">Explore career opportunities ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · FINAL CTA: navy, label + statement -->
+    <section class="final" aria-labelledby="final-title">
+      <div class="wrap lead-row">
+        <p class="tiny-label tiny-label--light">Beyond tomorrow</p>
+        <div>
+          <h2 class="statement statement--xl" id="final-title" data-split>Your tomorrow starts today.</h2>
+          <p class="lead-row__text reveal">Discover what's possible when confidence meets opportunity.</p>
+          <div class="final__actions reveal">
+            <a class="pill-btn pill-btn--gold" href="/contact/" data-planned data-track="cta_get_in_touch">Get in touch ↗</a>
+            <a class="pill-btn pill-btn--outline-light" href="/careers/" data-planned data-track="cta_join_team">Join our team</a>
+            <a class="pill-btn pill-btn--outline-light" href="#" data-whatsapp hidden data-track="whatsapp_click">WhatsApp us</a>
+          </div>
+          <p class="note note--block note--dark">WhatsApp, telephone, map and address appear here and in the footer once official details are confirmed in Site Settings.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 12 · FOOTER: black, columns, pill buttons, logo bottom-left -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="site-footer__top">
+        <nav class="site-footer__col" aria-label="About">
+          <h2 class="site-footer__heading">About</h2>
+          <ul>
+            <li><a href="/about/" data-planned>Our story</a></li>
+            <li><a href="/our-approach/" data-planned>Our approach</a></li>
+            <li><a href="/news/" data-planned>News &amp; insights</a></li>
+          </ul>
+        </nav>
+        <nav class="site-footer__col" aria-label="Programmes">
+          <h2 class="site-footer__heading">Programmes</h2>
+          <ul data-footer-programmes>
+            <li><a href="/programmes/" data-planned>All programmes</a></li>
+          </ul>
+        </nav>
+        <nav class="site-footer__col" aria-label="Careers">
+          <h2 class="site-footer__heading">Careers</h2>
+          <ul>
+            <li><a href="/careers/" data-planned>Join our team</a></li>
+            <li><a href="/careers/" data-planned>Current vacancies</a></li>
+          </ul>
+        </nav>
+        <div class="site-footer__col">
+          <h2 class="site-footer__heading">Contact</h2>
+          <ul data-footer-contact>
+            <li><a href="/contact/" data-planned>Send us a message</a></li>
+          </ul>
+        </div>
+        <div class="site-footer__pills">
+          <a class="pill-btn pill-btn--outline-light pill-btn--sm" href="/contact/" data-planned>Get in touch</a>
+          <a class="pill-btn pill-btn--outline-light pill-btn--sm" href="/careers/" data-planned>Careers</a>
+          <a class="pill-btn pill-btn--outline-light pill-btn--sm" href="/programmes/" data-planned>Programmes</a>
+          <ul class="social" data-footer-social aria-label="Social media"></ul>
+        </div>
+      </div>
+
+      <div class="site-footer__bottom">
+        <a class="logo logo--light" href="./" aria-label="Rockford Academy — home">
+          <svg class="logo__mark" viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M20 3H3v26h26V12" fill="none" stroke="currentColor" stroke-width="2.4"/>
+            <path d="M24 3h5v5" fill="none" stroke="var(--rf-gold)" stroke-width="2.4"/>
+          </svg>
+          <span class="logo__type"><span class="logo__name">Rockford</span><span class="logo__sub">Academy</span></span>
+        </a>
+        <p>© <span data-year>2026</span> Rockford Academy · Preparing people for opportunity</p>
+        <ul>
+          <li><a href="/privacy-policy/" data-planned>Privacy policy</a></li>
+          <li><a href="/terms/" data-planned>Terms &amp; conditions</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Concept review controls (removed in production) -->
+  <div class="review-bar" role="region" aria-label="Concept review controls">
+    <button type="button" class="review-bar__toggle" aria-pressed="true" data-notes-toggle>Review notes: on</button>
+    <a class="review-bar__demo" href="?demo=1" data-demo-link>Preview sample cards</a>
+  </div>
+  <div class="toast" role="status" aria-live="polite" data-toast hidden></div>
+</body>
+</html>

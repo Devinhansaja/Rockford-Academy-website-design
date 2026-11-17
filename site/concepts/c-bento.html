@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept C · Bright Bento</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#14243B;--gold:#D9A441;--tint:#F8EBD0;--blue:#234B73;--light:#F2F5F8;--ink:#1D2938}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:var(--light);color:var(--ink);overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.tag{position:fixed;left:16px;bottom:16px;z-index:99;background:var(--navy);color:#fff;font:700 12px Inter;padding:8px 14px;border-radius:99px}
+nav{display:flex;align-items:center;gap:28px;padding:20px max(16px,3vw)}
+nav b{font:800 20px Manrope;color:var(--navy);display:flex;align-items:center;gap:10px}
+nav b::before{content:"";width:28px;height:28px;border-radius:9px;background:conic-gradient(var(--gold) 0 25%,var(--navy) 0)}
+nav ul{display:flex;gap:6px;list-style:none;margin-left:auto;padding:6px;background:#fff;border-radius:99px;font-size:14px}
+nav li{padding:9px 16px;border-radius:99px}nav li:first-child{background:var(--navy);color:#fff}
+.cta-n{padding:13px 22px;border-radius:99px;background:var(--gold);color:var(--navy);font:700 14px Manrope}
+/* BENTO HERO */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:130px;gap:14px;padding:6px max(16px,3vw) 40px}
+.t{border-radius:30px;overflow:hidden;position:relative;opacity:0;transform:translateY(30px) scale(.97);animation:in .9s cubic-bezier(.2,.7,.1,1) forwards}
+@keyframes in{to{opacity:1;transform:none}}
+.t1{grid-column:1/8;grid-row:span 4;background:var(--navy);color:#fff;padding:44px;display:flex;flex-direction:column;justify-content:space-between}
+.t1 h1{font:800 clamp(2.8rem,5.6vw,5.6rem)/.95 Manrope;letter-spacing:-.04em}
+.t1 h1 span{color:var(--gold)}
+.rot{display:inline-block;height:1.05em;line-height:1.05em;overflow:hidden;vertical-align:bottom}
+.rot b{display:block;line-height:1.05em;color:var(--gold);animation:words 9s infinite}
+@keyframes words{0%,28%{transform:translateY(0)}33%,61%{transform:translateY(-1.05em)}66%,94%{transform:translateY(-2.1em)}100%{transform:translateY(0)}}
+.t1 p{max-width:460px;color:rgba(255,255,255,.75);font-size:17px;line-height:1.55}
+.t1 .row{display:flex;gap:10px;flex-wrap:wrap}
+.b{padding:15px 24px;border-radius:99px;font:700 14px Manrope;transition:transform .25s}.b:hover{transform:scale(1.05)}
+.bg{background:var(--gold);color:var(--navy)}.bw{background:rgba(255,255,255,.12)}
+.t2{grid-column:8/13;grid-row:span 3;animation-delay:.1s}
+.t2 img,.t5 img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s}.t:hover img{transform:scale(1.07)}
+.t2 .pill{position:absolute;left:18px;bottom:18px;padding:10px 16px;background:#fff;border-radius:99px;font:700 13px Manrope;color:var(--navy)}
+.t3{grid-column:8/11;grid-row:span 1;background:var(--gold);color:var(--navy);padding:22px 26px;display:flex;align-items:center;justify-content:space-between;animation-delay:.2s}
+.t3 b{font:800 20px Manrope}.t3 .arr{width:46px;height:46px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;transition:transform .3s}.t3:hover .arr{transform:rotate(-45deg)}
+.t4{grid-column:11/13;grid-row:span 1;background:#fff;padding:20px;display:flex;flex-direction:column;justify-content:center;animation-delay:.25s}
+.t4 b{font:800 40px Manrope;color:var(--blue)}.t4 small{color:#5B6878;font-size:12px}
+.t5{grid-column:1/4;grid-row:span 2;animation-delay:.3s}
+.t6{grid-column:4/9;grid-row:span 2;background:var(--blue);color:#fff;padding:30px;display:flex;flex-direction:column;justify-content:space-between;animation-delay:.35s}
+.t6 h3{font:800 26px/1.15 Manrope}.t6 .chips{display:flex;flex-wrap:wrap;gap:8px}
+.t6 .chips span{padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.14);font-size:13px;transition:background .3s}.t6 .chips span:hover{background:var(--gold);color:var(--navy)}
+.t7{grid-column:9/13;grid-row:span 2;background:var(--tint);padding:30px;display:flex;flex-direction:column;justify-content:space-between;animation-delay:.4s}
+.t7 h3{font:800 26px/1.15 Manrope;color:var(--navy)}.t7 p{color:var(--ink)}
+.steps{display:flex;gap:6px}.steps i{flex:1;height:8px;border-radius:9px;background:rgba(20,36,59,.15);overflow:hidden;position:relative}
+.steps i::after{content:"";position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:left;animation:fill 1.2s forwards}
+.steps i:nth-child(2)::after{animation-delay:.4s}.steps i:nth-child(3)::after{animation-delay:.8s}.steps i:nth-child(4)::after{animation-delay:1.2s}
+@keyframes fill{to{transform:none}}
+/* AREAS */
+.sec{padding:80px max(16px,3vw)}
+.sec h2{font:800 clamp(2.2rem,4.5vw,4rem)/1 Manrope;letter-spacing:-.03em;color:var(--navy);max-width:16ch}
+.ag{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
+.a{background:#fff;border-radius:26px;padding:30px;display:flex;gap:18px;align-items:flex-start;transition:transform .35s,box-shadow .35s}
+.a:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(20,36,59,.12)}
+.ic{flex:none;width:56px;height:56px;border-radius:18px;display:grid;place-items:center;font:800 20px Manrope}
+.a:nth-child(3n+1) .ic{background:var(--tint);color:var(--navy)}.a:nth-child(3n+2) .ic{background:var(--navy);color:var(--gold)}.a:nth-child(3n) .ic{background:var(--blue);color:#fff}
+.a h3{font:800 19px/1.25 Manrope;color:var(--navy)}.a p{color:#5B6878;margin-top:6px;font-size:14.5px}
+@media(max-width:900px){.bento{grid-template-columns:1fr;grid-auto-rows:auto}.bento .t{grid-column:auto!important;grid-row:auto!important;min-height:200px}.ag{grid-template-columns:1fr}nav ul{display:none}}
+</style></head><body>
+<span class="tag">Concept C · Bright Bento</span>
+<nav><b>Rockford</b><ul><li>Home</li><li>About</li><li>Programmes</li><li>Approach</li><li>Careers</li></ul><a class="cta-n" href="#">Get in touch</a></nav>
+<section class="bento">
+  <div class="t t1"><h1>Beyond English.<br>Beyond the <span class="rot"><b>classroom.<br>ordinary.<br>expected.</b></span></h1>
+    <p>Preparing young people for the opportunities of tomorrow through communication, confidence and personal development.</p>
+    <div class="row"><a class="b bg" href="#">Explore programmes →</a><a class="b bw" href="#">Discover Rockford</a></div></div>
+  <div class="t t2"><img src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=1000&q=70" alt=""><span class="pill">Illustrative photo</span></div>
+  <a class="t t3" href="#"><b>Join our team</b><span class="arr">→</span></a>
+  <div class="t t4"><b>06</b><small>Development areas</small></div>
+  <div class="t t5"><img src="https://images.unsplash.com/photo-1682962232755-f1d051ddb638?auto=format&fit=crop&w=800&q=70" alt=""></div>
+  <div class="t t6"><h3>What we develop</h3><div class="chips"><span>Spoken English</span><span>Confidence</span><span>Personality</span><span>Critical thinking</span><span>Workplace</span><span>Future readiness</span></div></div>
+  <div class="t t7"><h3>Discover → Develop → Practise → Transform</h3><div class="steps"><i></i><i></i><i></i><i></i></div><p>Your journey with Rockford.</p></div>
+</section>
+<section class="sec"><h2>Six areas. One confident you.</h2>
+  <div class="ag">
+    <div class="a"><span class="ic">01</span><div><h3>Spoken English &amp; Communication</h3><p>Find your voice.</p></div></div>
+    <div class="a"><span class="ic">02</span><div><h3>Confidence &amp; Self-Expression</h3><p>Express yourself with clarity.</p></div></div>
+    <div class="a"><span class="ic">03</span><div><h3>Personality &amp; Interpersonal Skills</h3><p>Build meaningful connections.</p></div></div>
+    <div class="a"><span class="ic">04</span><div><h3>Critical Thinking</h3><p>Think beyond the obvious.</p></div></div>
+    <div class="a"><span class="ic">05</span><div><h3>Workplace Readiness</h3><p>Prepare for the real world.</p></div></div>
+    <div class="a"><span class="ic">06</span><div><h3>Future Readiness</h3><p>Adapt to a changing world.</p></div></div>
+  </div></section>
+</body></html>

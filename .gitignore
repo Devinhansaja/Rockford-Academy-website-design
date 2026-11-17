@@ -1,0 +1,7 @@
+# Local tooling and OS files
+.claude/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Private runtime data (database, sessions, CVs, mail outbox) is ignored in rockford/.gitignore
