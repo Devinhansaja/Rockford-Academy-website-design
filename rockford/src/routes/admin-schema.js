@@ -431,7 +431,7 @@ const SECTIONS = [
   },
   {
     key: 'slideshow', label: 'Hero slideshow', area: 'content', group: 'pages',
-    description: 'Up to five full-screen photos behind the homepage headline. They crossfade every 6 seconds. Choose photos whose main subject is on the right-hand side, because the headline sits on the left. Leave a slide empty to skip it.',
+    description: 'Up to five photos shown in the framed slideshow beside the homepage headline. They crossfade every 6 seconds. Landscape photos with the people near the centre work best. Leave a slide empty to skip it.',
     fields: Array.from({ length: 5 }, (_, i) => [
       { section: `Slide ${i + 1}` },
       { name: `sl_${i}_src`, label: 'Image URL', required: i === 0, maxlength: 500, image: true },
@@ -495,7 +495,7 @@ const PAGE_DESCRIPTIONS = {
   images: 'Hero, section and gallery photos, with alt text and the stock-photo label.',
   legal: 'Privacy policy and terms of use (Markdown).',
   announcement: 'A short notice at the top of every page, with optional start and end dates.',
-  slideshow: 'Up to five full-screen photos that crossfade behind the homepage headline.',
+  slideshow: 'Up to five photos that crossfade in the framed slideshow beside the homepage headline.',
 };
 
 module.exports = {

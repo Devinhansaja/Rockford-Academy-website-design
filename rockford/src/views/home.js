@@ -56,14 +56,14 @@ const HIGHLIGHTS = [
   ['Practical Learning', 'Real skills for real life.', ICON('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>')],
 ];
 
-/** Full-screen luxury hero: crossfading photo slideshow, stationary copy, glass bar and gallery controls. */
+/** Homepage hero on White: Slate headline on the left, framed crossfading photo slideshow on the right, info bar below. */
 function luxHero(s, line1Count) {
   const fallback = s.images && s.images.hero ? [s.images.hero] : [];
   const slides = (Array.isArray(s.hero_slides) && s.hero_slides.filter((x) => x && x.src).length ? s.hero_slides.filter((x) => x && x.src) : fallback).slice(0, 5);
   const n = slides.length;
   const pad = (i) => String(i).padStart(2, '0');
   const slideHtml = slides.map((im, i) => `<div class="lux-slide${i === 0 ? ' is-active' : ''}" data-slide role="group" aria-roledescription="slide" aria-label="${i + 1} of ${n}"${i ? ' aria-hidden="true"' : ''}>
-      ${picture(im, { eager: i === 0, sizes: '100vw', cls: 'lux-slide__img' })}
+      ${picture(im, { eager: i === 0, sizes: '(min-width: 1000px) 45vw, 100vw', cls: 'lux-slide__img' })}
       ${im.stock ? '<span class="stock-label">Illustrative photo</span>' : ''}
     </div>`).join('');
   const controls = n > 1 ? `<div class="lux-controls" data-slider-controls>
@@ -77,8 +77,6 @@ function luxHero(s, line1Count) {
         </button>
       </div>` : '';
   return `<section class="lux-hero" aria-labelledby="hero-title" data-hero-slider data-interval="6000" aria-roledescription="carousel">
-  <div class="lux-hero__slides" aria-live="off">${slideHtml}</div>
-  <div class="lux-hero__shade" aria-hidden="true"></div>
   <div class="lux-hero__frame">
     <div class="lux-hero__text">
       <p class="lux-eyebrow">${h(s.home_hero_eyebrow || 'A world of opportunity')}</p>
@@ -89,9 +87,12 @@ function luxHero(s, line1Count) {
         <a class="lux-btn lux-btn--line" href="/about" data-track="cta_discover">Discover Rockford <span aria-hidden="true">→</span></a>
       </div>
     </div>
+    <div class="lux-hero__visual">
+      <div class="lux-hero__slides" aria-live="off">${slideHtml}</div>
+      ${controls}
+    </div>
     <div class="lux-hero__bottom">
       <ul class="lux-glass" aria-label="What Rockford develops">${HIGHLIGHTS.map(([t, d, ic]) => `<li class="lux-glass__item"><span class="lux-glass__icon">${ic}</span><span><b>${h(t)}</b><small>${h(d)}</small></span></li>`).join('')}</ul>
-      ${controls}
     </div>
   </div>
 </section>`;

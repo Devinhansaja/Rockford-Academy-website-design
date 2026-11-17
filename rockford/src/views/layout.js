@@ -143,7 +143,7 @@ ${s.search_console_verification ? `<meta name="google-site-verification" content
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@300;400;500;600&family=Instrument+Serif&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/main.css?v=9">
+<link rel="stylesheet" href="/assets/css/main.css?v=10">
 ${introScript}
 ${analyticsHead(ctx)}
 ${ld}
