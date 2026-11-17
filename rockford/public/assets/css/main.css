@@ -720,6 +720,23 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .chip--coming_soon { color: var(--gold); }
 .pill:not(.pill--gold):not(.pill--outline) { background: var(--ivory); color: var(--navy); }
 
+/* Exact palette values only — no faded tints of text, borders or labels */
+.lux-hero, .cine-band, .cine-final, .mobile-menu, .site-header, .site-footer { --line-dark: #E7EAF0; --muted-dark: #FFFFFF; }
+.primary-nav a, .site-footer__col a, .site-footer__bottom, .site-footer__bottom a { color: #FFFFFF; }
+.site-footer, .site-footer__bottom { border-color: #E7EAF0; }
+.stock-label { background: #142747; color: #FFFFFF; }
+.lux-lede, .lux-glass small, .cine-band__inner .caps-sub, .cine-final p.lead, .contact-strip dd { color: #FFFFFF; }
+.lux-btn--line, .lux-ctl, .pill-btn--outline-light { border-color: #FFFFFF; }
+.lux-ctl { background: #142747; }
+.lux-glass, .lux-glass__icon { border-color: #C99A43; }
+.lux-glass__item + .lux-glass__item { border-left-color: #E7EAF0; }
+.lux-dot::before { background: #E7EAF0; }
+.lux-count { color: #FFFFFF; }
+/* Form fields: Muted Slate edge so fields stay visible on White (Light Border Grey is too faint for inputs) */
+.field input[type="text"], .field input[type="email"], .field input[type="tel"], .field textarea, .field select, .field input[type="file"] { border-color: #64748B; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: #142747; box-shadow: 0 0 0 3px #E7EAF0; }
+.field .req { color: #C99A43; }
+
 /* Buttons: Heritage Gold */
 .pill-btn--navy, .pub-card--cta .pill-btn--navy, .detail-aside .pill-btn--navy { background-color: var(--gold); color: var(--navy); --sweep: #fff; box-shadow: 0 12px 30px rgba(201, 154, 67, .25); }
 .pill-btn--navy:hover { color: var(--navy); }
