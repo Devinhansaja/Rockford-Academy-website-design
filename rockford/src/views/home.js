@@ -154,7 +154,7 @@ function home(ctx, { programmes, vacancies, testimonials, articles }) {
 </section>` : '';
 
   const news = articles.length ? `
-<section class="section-pad" aria-labelledby="news-title">
+<section class="section-pad surface-light" aria-labelledby="news-title">
   <div class="wrap">
     <div class="head-split"><h2 class="big-title reveal" id="news-title">News &amp; <em>insights</em></h2><p class="caps-sub reveal">Updates, ideas and stories from Rockford Academy.</p></div>
     <div class="pub-grid pub-grid--3">${articles.slice(0, 3).map(articleCard).join('')}</div>
@@ -176,7 +176,7 @@ ${luxHero(s, line1Count)}
   </div>
 </section>
 
-<section class="cine-vm" aria-labelledby="vm-title">
+<section class="cine-vm surface-light" aria-labelledby="vm-title">
   <div class="wrap">
     <h2 class="tiny-label" id="vm-title" style="margin-bottom:40px">Vision &amp; mission</h2>
     <div class="vm2">
@@ -187,14 +187,14 @@ ${luxHero(s, line1Count)}
   </div>
 </section>
 
-<section class="cine-cards surface-light" id="dimensions" aria-labelledby="dimensions-title">
+<section class="cine-cards paper" id="dimensions" aria-labelledby="dimensions-title">
   <div class="wrap">
     <div class="head-split"><h2 class="big-title reveal" id="dimensions-title">What we <em>develop</em></h2><p class="caps-sub reveal">${h(s.home_dims_intro)}</p></div>
     <ol class="glow-grid">${DIMENSIONS.map(([, t, d], i) => `<li class="glow reveal" style="--d:${(i % 3) * 0.08}s"><span class="glow__num">${ROMAN[i]}</span><h3>${h(t)}</h3><p>${h(d)}</p></li>`).join('')}</ol>
   </div>
 </section>
 
-<div class="marquee paper" role="region" aria-label="What we develop">
+<div class="marquee surface-light" role="region" aria-label="What we develop">
   <div class="marquee__track">
     ${[0, 1].map((dup) => `<ul class="marquee__group"${dup ? ' aria-hidden="true"' : ''}>${['Spoken English', 'Communication', 'Confidence', 'Personality', 'Critical Thinking', 'Workplace Readiness', 'Future Readiness'].map((t) => `<li class="marquee__item">${h(t)}</li>`).join('')}</ul>`).join('')}
   </div>
@@ -210,14 +210,14 @@ ${luxHero(s, line1Count)}
   </div>
 </section>
 
-<section class="cine-gallery paper" aria-labelledby="env-title">
+<section class="cine-gallery surface-light" aria-labelledby="env-title">
   <div class="wrap">
     <div class="head-split"><h2 class="big-title reveal" id="env-title">Our <em>environment</em></h2><p class="caps-sub reveal">Classrooms, collaborative spaces and presentation areas designed for participation and practice.</p></div>
     <ul class="gal">${gallery.map((g, i) => `<li class="reveal" style="--d:${i * 0.08}s">${photo(g, { caption: g.label })}</li>`).join('')}</ul>
   </div>
 </section>
 
-<section class="figures surface-light" aria-label="Rockford at a glance">
+<section class="figures paper" aria-label="Rockford at a glance">
   <div class="wrap figures__row">
     <div class="figure"><p class="figure__big"><span>06</span> Development areas</p><p class="figure__small">Communication, confidence, personality, critical thinking, workplace and future readiness.</p></div>
     <div class="figure"><p class="figure__big"><span>04</span> Journey stages</p><p class="figure__small">Discover, develop, practise and transform.</p></div>

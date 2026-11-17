@@ -12,7 +12,7 @@
   --blue: #142747;          /* links / focus on light use Primary Navy */
   --gold: #C99A43;          /* Heritage Gold — buttons and highlights */
   --gold-2: #C99A43;        /* gold text on navy */
-  --gold-ink: #8C6A2A;      /* Heritage Gold darkened only for small gold text on white (accessibility, 5:1) */
+  --gold-ink: #C99A43;      /* gold text on light = Heritage Gold (exact) */
   --ivory: #F5F1E7;         /* Warm Ivory — alternate section backgrounds */
   --tint: #F5F1E7;
   --paper: #FFFFFF;         /* White — main page background */
@@ -20,8 +20,8 @@
   --ink: #27364B;           /* Slate — body text */
   --slate: #64748B;         /* Muted Slate — secondary text and captions */
   --line-light: #E7EAF0;    /* Light Border Grey — card borders and dividers */
-  --line-dark: rgba(255, 255, 255, .1);
-  --muted-dark: rgba(255, 255, 255, .72);
+  --line-dark: #E7EAF0;     /* dividers on light sections = Light Border Grey (dark areas override) */
+  --muted-dark: #64748B;    /* secondary text on light sections = Muted Slate (dark areas override) */
 
   --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -65,8 +65,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .section-pad { padding: clamp(80px, 9vw, 140px) 0; }
 .section-pad + .section-pad { padding-top: 0; }
 .section-pad:not(.surface-light) + .section-pad.surface-light, .section-pad.surface-light + .section-pad:not(.surface-light) { padding-top: clamp(80px, 9vw, 140px); }
-/* Navy signature bands: white text */
-.lux-hero, .cine-vm, .cine-cards, .develop, .cine-split, .cine-band, .figures, .marquee, .stories, .cine-final, .final, .page-hero, .journey-wrap, .mobile-menu { color: #fff; }
+/* Only the header, footer and photo areas are dark; they get white text and their own line/muted tones. */
+.lux-hero, .cine-band, .cine-final, .mobile-menu, .site-header, .site-footer { color: #fff; --line-dark: rgba(255, 255, 255, .12); --muted-dark: rgba(255, 255, 255, .74); }
 
 /* ── Type ──────────────────────────────────────────────────────────────── */
 .tiny-label {
@@ -666,6 +666,69 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .figures.surface-light .figure__small { color: var(--slate); }
 .gal .stagger__cap { color: #fff; }
 
+/* ══ Brand colour placement (per the approved palette sheet) ═════════════
+   Navy #142747  → header, footer, headings
+   Gold #C99A43  → buttons and highlights
+   White         → main page background · Warm Ivory → alternate sections
+   Slate         → body text · Muted Slate → secondary text and captions
+   Light Border Grey → card borders and dividers
+   Photo areas (homepage hero, photo band, closing photo) keep their images. */
+
+/* Header: always Primary Navy */
+.site-header, .site-header.is-solid { background: var(--navy); }
+
+/* Section backgrounds: White by default, Warm Ivory where marked .surface-light */
+.cine-statement, .cine-vm, .cine-cards, .develop, .cine-split, .figures, .marquee, .stories, .cine-gallery, .journey-wrap { background: var(--white); color: var(--ink); }
+.page-hero, .final { background: var(--ivory); color: var(--ink); }
+.final { border-top: 1px solid var(--line-light); }
+:is(.cine-statement, .cine-vm, .cine-cards, .develop, .cine-split, .figures, .marquee, .stories, .cine-gallery, .journey-wrap).surface-light { background: var(--ivory); }
+.develop, .journey-wrap { background: var(--ivory); }
+
+/* Headings: Primary Navy (white only on photos, header and footer) */
+.big-title, .serif-xl, .statement, .cine-title, .vm2__text, .vm-card__text, .steps-list h3, .vlist .t, .alt-card h3, .principles h3, .quote-card blockquote p, .figure__big { color: var(--navy); }
+.page-hero .statement { color: var(--navy); }
+:is(.cine-band, .cine-final) :is(.cine-title, .big-title, .statement) { color: #fff; }
+:is(.big-title, .serif-xl, .statement) em, .page-hero .statement em { background: none; color: var(--gold); animation: none; }
+.cine-title i { color: var(--gold); }
+
+/* Body text Slate, secondary text Muted Slate */
+.caps-sub, .lead-row__text, .muted, .figure__small, .steps-list p, .vlist .m, .alt-card p, .principles p, .glow p, .o-card__text, .d-card p, .quote-card__who { color: var(--slate); }
+.cine-band__inner .caps-sub { color: rgba(255, 255, 255, .85); }
+
+/* Cards: White with Light Border Grey (on Warm Ivory or White sections) */
+.glow-grid, .o-grid, .d-cards, .vm2, .steps4, .alt-grid { background: var(--line-light); border-color: var(--line-light); }
+.glow, .o-card, .d-card, .vm2__item, .alt-card, .glow:hover, .o-card:hover, .d-card:hover { background: var(--white); color: var(--navy); }
+.glow::before, .o-card::before, .d-card::before, .vm2__item::after, .alt-card::after { background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 0%), rgba(201, 154, 67, .14), transparent 60%); }
+.quote-card { background: var(--white); border-color: var(--line-light); }
+.quote-card__who strong { color: var(--navy); }
+.pub-card--cta { background: var(--white); color: var(--ink); border: 1px solid var(--line-light); }
+.pub-card--cta .pub-card__title { color: var(--navy); }
+.pub-card--cta .pub-card__text { color: var(--slate); }
+.vm-card--navy { background: var(--ivory); color: var(--navy); }
+.vm-card--navy .pill { background: var(--white); color: var(--navy); }
+.detail-aside { background: var(--ivory); color: var(--ink); border: 1px solid var(--line-light); }
+.facts dt { color: var(--gold); }
+.promise-line { color: var(--gold); }
+.promise-line i { color: var(--navy); }
+.marquee { border-color: var(--line-light); }
+.marquee .marquee__item { -webkit-text-stroke-color: rgba(20, 39, 71, .45); }
+.cine-statement { border-bottom-color: var(--line-light); }
+
+/* Highlights: Heritage Gold (labels, numerals) */
+.tiny-label, :is(.paper, .section-pad, .surface-light) .tiny-label { color: var(--gold); font-weight: 600; }
+.glow__num, .d-card__num, .steps-list b, .figure__big span, .scenario__num, .apply-steps span, .principles span, .principles--light span { color: var(--gold); }
+.chip--coming_soon { color: var(--gold); }
+.pill:not(.pill--gold):not(.pill--outline) { background: var(--ivory); color: var(--navy); }
+
+/* Buttons: Heritage Gold */
+.pill-btn--navy, .pub-card--cta .pill-btn--navy, .detail-aside .pill-btn--navy { background-color: var(--gold); color: var(--navy); --sweep: #fff; box-shadow: 0 12px 30px rgba(201, 154, 67, .25); }
+.pill-btn--navy:hover { color: var(--navy); }
+.pill-btn--outline, :is(.paper, .section-pad, .surface-light, .page-hero, .final, .cine-statement, .cine-split, .cine-vm, .stories, .journey-wrap, .develop) :is(.pill-btn--outline-light, .pill-btn--outline-gold) { border-color: var(--gold); color: var(--navy); --sweep: var(--gold); backdrop-filter: none; }
+.pill-btn--outline:hover, :is(.paper, .section-pad, .surface-light, .page-hero, .final, .cine-statement, .cine-split, .cine-vm, .stories, .journey-wrap, .develop) :is(.pill-btn--outline-light, .pill-btn--outline-gold):hover { color: var(--navy); border-color: var(--gold); }
+.ev-card .circle-arrow { color: var(--navy); border-color: var(--gold); }
+.ev-card:hover .circle-arrow, .vlist li a:hover .circle-arrow { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+.vlist .circle-arrow { color: var(--gold); }
+
 /* ── Motion ────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; }
@@ -692,9 +755,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .js .cine-split__media .mreveal.is-in, .js .cine-band__media .mreveal.is-in, .js .cine-final__media .mreveal.is-in { clip-path: inset(0 0 0 0); }
 .parallax .ph__img { top: -8%; bottom: auto; height: 116%; translate: 0 var(--py, 0px); will-change: translate; }
 
-.to-top { position: fixed; right: 18px; bottom: 18px; z-index: 55; width: 50px; height: 50px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .25); background: rgba(20, 39, 71, .8); color: #fff; font-size: 18px; opacity: 0; transform: translateY(16px) scale(.9); pointer-events: none; transition: opacity .35s, transform .45s var(--ease), background-color .25s, color .25s; }
+.to-top { position: fixed; right: 18px; bottom: 18px; z-index: 55; width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--gold); background: var(--gold); color: var(--navy); font-size: 18px; opacity: 0; transform: translateY(16px) scale(.9); pointer-events: none; transition: opacity .35s, transform .45s var(--ease), background-color .25s, color .25s; }
 .to-top.is-visible { opacity: 1; transform: none; pointer-events: auto; }
-.to-top:hover { background: var(--gold); color: var(--deep); border-color: var(--gold); }
+.to-top:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
 
 /* ── Small screens ─────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
