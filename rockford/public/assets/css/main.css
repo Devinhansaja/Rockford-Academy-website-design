@@ -66,7 +66,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .section-pad + .section-pad { padding-top: 0; }
 .section-pad:not(.surface-light) + .section-pad.surface-light, .section-pad.surface-light + .section-pad:not(.surface-light) { padding-top: clamp(80px, 9vw, 140px); }
 /* Only the header, footer and photo areas are dark; they get white text and their own line/muted tones. */
-.cine-band, .cine-final, .mobile-menu, .site-header, .site-footer { color: #fff; --line-dark: rgba(255, 255, 255, .12); --muted-dark: rgba(255, 255, 255, .74); }
+.mobile-menu, .site-header, .site-footer { color: #fff; --line-dark: rgba(255, 255, 255, .12); --muted-dark: rgba(255, 255, 255, .74); }
 
 /* ── Type ──────────────────────────────────────────────────────────────── */
 .tiny-label {
@@ -375,12 +375,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .vlist .empty { padding: 20px 0; border-bottom: 1px solid var(--line-dark); color: var(--muted-dark); }
 
 /* ── Full-bleed photo band ─────────────────────────────────────────────── */
-.cine-band { position: relative; min-height: 86vh; display: flex; align-items: flex-end; overflow: hidden; isolation: isolate; }
-.cine-band__media { position: absolute; inset: 0; z-index: -2; }
-.cine-band__media .ph { position: absolute; inset: 0; border-radius: 0; }
-.cine-band::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(20, 39, 71, .2) 20%, rgba(20, 39, 71, .92)); }
-.cine-band__inner { padding-top: 160px; padding-bottom: clamp(60px, 8vw, 110px); }
-.cine-band__inner .caps-sub { color: rgba(255, 255, 255, .82); }
+/* "The Rockford difference" statement band — Warm Ivory, no background photo */
+.cine-band { position: relative; overflow: hidden; background: #F5F1E7; color: #27364B; }
+.cine-band__inner { padding-top: clamp(90px, 10vw, 150px); padding-bottom: clamp(60px, 8vw, 110px); }
 
 /* ── Environment gallery ───────────────────────────────────────────────── */
 .cine-gallery { padding: clamp(90px, 10vw, 150px) 0; }
@@ -465,21 +462,19 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .quote-card__video iframe { width: 100%; height: 100%; border: 0; }
 
 /* ── Final CTA + contact ───────────────────────────────────────────────── */
-.cine-final { position: relative; overflow: hidden; isolation: isolate; padding: clamp(120px, 14vw, 200px) 0 clamp(80px, 9vw, 130px); text-align: center; }
-.cine-final__media { position: absolute; inset: 0; z-index: -2; }
-.cine-final__media .ph { position: absolute; inset: 0; border-radius: 0; }
-.cine-final::after { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(60% 70% at 50% 40%, rgba(20, 39, 71, .55), rgba(20, 39, 71, .94)); }
+/* Closing call to action — Warm Ivory, no background photo */
+.cine-final { position: relative; overflow: hidden; padding: clamp(90px, 11vw, 160px) 0 clamp(80px, 9vw, 130px); text-align: center; background: #F5F1E7; color: #27364B; border-top: 1px solid #E7EAF0; }
 .cine-final .tiny-label { justify-content: center; }
 .cine-final .tiny-label::after { content: ""; width: 44px; height: 1px; background: var(--gold); }
 .cine-final .cine-title { margin-top: 26px; font-size: clamp(3rem, 7.6vw, 7.6rem); }
-.cine-final p.lead { margin: 26px auto 34px; max-width: 520px; color: rgba(255, 255, 255, .82); }
+.cine-final p.lead { margin: 26px auto 34px; max-width: 520px; color: #27364B; }
 .cine-final .actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
-.contact-strip { display: grid; gap: 18px 40px; margin: 64px auto 0; max-width: 1100px; padding-top: 32px; border-top: 1px solid rgba(255, 255, 255, .16); text-align: left; }
+.contact-strip { display: grid; gap: 18px 40px; margin: 64px auto 0; max-width: 1100px; padding-top: 32px; border-top: 1px solid #E7EAF0; text-align: left; }
 @media (min-width: 760px) { .contact-strip { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); } }
 .contact-strip dt { font: 500 11px/1.4 var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--gold-2); }
-.contact-strip dd { margin-top: 6px; color: #fff; }
+.contact-strip dd { margin-top: 6px; color: #27364B; }
 .contact-strip a { text-decoration: underline; text-underline-offset: 3px; }
-.home-map { margin: 28px auto 0; max-width: 1100px; border-radius: var(--r); overflow: hidden; aspect-ratio: 21 / 8; border: 1px solid rgba(255, 255, 255, .16); }
+.home-map { margin: 28px auto 0; max-width: 1100px; border-radius: var(--r); overflow: hidden; aspect-ratio: 21 / 8; border: 1px solid #E7EAF0; }
 .home-map iframe { width: 100%; height: 100%; border: 0; }
 
 /* Compact CTA band used on inner pages */
@@ -680,13 +675,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* Headings: Primary Navy (white only on photos, header and footer) */
 .big-title, .serif-xl, .statement, .cine-title, .vm2__text, .vm-card__text, .steps-list h3, .vlist .t, .alt-card h3, .principles h3, .quote-card blockquote p, .figure__big { color: var(--navy); }
 .page-hero .statement { color: var(--navy); }
-:is(.cine-band, .cine-final) :is(.cine-title, .big-title, .statement) { color: #fff; }
 :is(.big-title, .serif-xl, .statement) em, .page-hero .statement em { background: none; color: var(--gold); animation: none; }
 .cine-title i { color: var(--gold); }
 
 /* Body text Slate, secondary text Muted Slate */
 .caps-sub, .lead-row__text, .muted, .figure__small, .steps-list p, .vlist .m, .alt-card p, .principles p, .glow p, .o-card__text, .d-card p, .quote-card__who { color: var(--slate); }
-.cine-band__inner .caps-sub { color: rgba(255, 255, 255, .85); }
 
 /* Cards: White with Light Border Grey (on Warm Ivory or White sections) */
 .glow-grid, .o-grid, .d-cards, .vm2, .steps4, .alt-grid { background: var(--line-light); border-color: var(--line-light); }
@@ -705,7 +698,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .promise-line i { color: var(--navy); }
 .marquee { border-color: var(--line-light); }
 .marquee .marquee__item { -webkit-text-stroke-color: rgba(20, 39, 71, .45); }
-.cine-statement { border-bottom-color: var(--line-light); }
+.cine-statement { border-bottom-color: var(--line-light); border-top: 1px solid #E7EAF0; }
 
 /* Highlights: Heritage Gold (labels, numerals) */
 .tiny-label, :is(.paper, .section-pad, .surface-light) .tiny-label { color: var(--gold); font-weight: 600; }
@@ -714,11 +707,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .pill:not(.pill--gold):not(.pill--outline) { background: var(--ivory); color: var(--navy); }
 
 /* Exact palette values only — no faded tints of text, borders or labels */
-.cine-band, .cine-final, .mobile-menu, .site-header, .site-footer { --line-dark: #E7EAF0; --muted-dark: #FFFFFF; }
+.mobile-menu, .site-header, .site-footer { --line-dark: #E7EAF0; --muted-dark: #FFFFFF; }
 .primary-nav a, .site-footer__col a, .site-footer__bottom, .site-footer__bottom a { color: #FFFFFF; }
 .site-footer, .site-footer__bottom { border-color: #E7EAF0; }
 .stock-label { background: #142747; color: #FFFFFF; }
-.cine-band__inner .caps-sub, .cine-final p.lead, .contact-strip dd { color: #FFFFFF; }
 .pill-btn--outline-light { border-color: #FFFFFF; }
 /* Form fields: Muted Slate edge so fields stay visible on White (Light Border Grey is too faint for inputs) */
 .field input[type="text"], .field input[type="email"], .field input[type="tel"], .field textarea, .field select, .field input[type="file"] { border-color: #64748B; }

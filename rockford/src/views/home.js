@@ -226,8 +226,7 @@ ${luxHero(s, line1Count)}
   </div>
 </section>
 
-<section class="cine-band" id="difference" aria-labelledby="difference-title">
-  <div class="cine-band__media">${photo(img.difference, { sizes: '100vw', cls: 'parallax' })}</div>
+<section class="cine-band surface-light" id="difference" aria-labelledby="difference-title">
   <div class="wrap cine-band__inner">
     <p class="tiny-label">The Rockford difference</p>
     <h2 class="cine-title cine-title--md" id="difference-title" data-split>${h(s.home_difference_statement)}</h2>
@@ -263,8 +262,7 @@ ${stories}
 
 ${news}
 
-<section class="cine-final" aria-labelledby="final-title">
-  <div class="cine-final__media">${photo(img.hero, { sizes: '100vw', cls: 'parallax' })}</div>
+<section class="cine-final surface-light" aria-labelledby="final-title">
   <div class="wrap">
     <p class="tiny-label">Beyond tomorrow</p>
     <h2 class="cine-title" id="final-title" data-split>${h(s.home_final_title)}</h2>
