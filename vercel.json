@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo no-install",
+  "buildCommand": "cd rockford && node scripts/export-static.js",
+  "outputDirectory": "rockford/dist",
+  "cleanUrls": true,
+  "trailingSlash": false
+}
