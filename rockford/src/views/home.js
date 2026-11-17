@@ -165,7 +165,7 @@ function home(ctx, { programmes, vacancies, testimonials, articles }) {
   return `
 ${luxHero(s, line1Count)}
 
-<section class="cine-statement" id="purpose" aria-labelledby="purpose-title">
+<section class="cine-statement paper" id="purpose" aria-labelledby="purpose-title">
   <div class="wrap two-col">
     <p class="tiny-label">Our purpose</p>
     <div>
@@ -187,14 +187,14 @@ ${luxHero(s, line1Count)}
   </div>
 </section>
 
-<section class="cine-cards" id="dimensions" aria-labelledby="dimensions-title">
+<section class="cine-cards surface-light" id="dimensions" aria-labelledby="dimensions-title">
   <div class="wrap">
     <div class="head-split"><h2 class="big-title reveal" id="dimensions-title">What we <em>develop</em></h2><p class="caps-sub reveal">${h(s.home_dims_intro)}</p></div>
     <ol class="glow-grid">${DIMENSIONS.map(([, t, d], i) => `<li class="glow reveal" style="--d:${(i % 3) * 0.08}s"><span class="glow__num">${ROMAN[i]}</span><h3>${h(t)}</h3><p>${h(d)}</p></li>`).join('')}</ol>
   </div>
 </section>
 
-<div class="marquee" role="region" aria-label="What we develop">
+<div class="marquee paper" role="region" aria-label="What we develop">
   <div class="marquee__track">
     ${[0, 1].map((dup) => `<ul class="marquee__group"${dup ? ' aria-hidden="true"' : ''}>${['Spoken English', 'Communication', 'Confidence', 'Personality', 'Critical Thinking', 'Workplace Readiness', 'Future Readiness'].map((t) => `<li class="marquee__item">${h(t)}</li>`).join('')}</ul>`).join('')}
   </div>
@@ -210,14 +210,14 @@ ${luxHero(s, line1Count)}
   </div>
 </section>
 
-<section class="cine-gallery" aria-labelledby="env-title">
+<section class="cine-gallery paper" aria-labelledby="env-title">
   <div class="wrap">
     <div class="head-split"><h2 class="big-title reveal" id="env-title">Our <em>environment</em></h2><p class="caps-sub reveal">Classrooms, collaborative spaces and presentation areas designed for participation and practice.</p></div>
     <ul class="gal">${gallery.map((g, i) => `<li class="reveal" style="--d:${i * 0.08}s">${photo(g, { caption: g.label })}</li>`).join('')}</ul>
   </div>
 </section>
 
-<section class="figures" aria-label="Rockford at a glance">
+<section class="figures surface-light" aria-label="Rockford at a glance">
   <div class="wrap figures__row">
     <div class="figure"><p class="figure__big"><span>06</span> Development areas</p><p class="figure__small">Communication, confidence, personality, critical thinking, workplace and future readiness.</p></div>
     <div class="figure"><p class="figure__big"><span>04</span> Journey stages</p><p class="figure__small">Discover, develop, practise and transform.</p></div>
@@ -233,11 +233,11 @@ ${luxHero(s, line1Count)}
     <p class="caps-sub reveal">${h(s.home_difference_sub)}</p>
   </div>
 </section>
-<section class="cine-cards cine-cards--tight" style="padding-top:clamp(60px,6vw,90px)" aria-label="How Rockford teaches">
+<section class="cine-cards cine-cards--tight paper" style="padding-top:clamp(60px,6vw,90px)" aria-label="How Rockford teaches">
   <div class="wrap"><ol class="d-cards">${PRINCIPLES.map(([t, d], i) => `<li class="d-card reveal" style="--d:${(i % 3) * 0.08}s"><span class="d-card__num">0${i + 1}</span><h3>${h(t)}</h3><p>${h(d)}</p></li>`).join('')}</ol></div>
 </section>
 
-<section class="section-pad" id="programmes" aria-labelledby="programmes-title">
+<section class="section-pad surface-light" id="programmes" aria-labelledby="programmes-title">
   <div class="wrap">
     <div class="head-split">
       <div><p class="tiny-label">Programmes</p><h2 class="big-title reveal" id="programmes-title" style="margin-top:20px">${h(s.home_programmes_title)}</h2></div>

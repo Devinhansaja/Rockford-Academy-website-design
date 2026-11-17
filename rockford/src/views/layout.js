@@ -9,12 +9,12 @@ const NAV = [
 
 const abs = (p) => (config.siteUrl ? config.siteUrl + p : '');
 
-/** Header logo: the Rockford crest (shield only) with the name set beside it. A logo uploaded in Admin overrides it. */
+/** Header logo: the complete Rockford crest exactly as supplied (brand rule: never crop, redraw or recolour).
+ *  Only the plain white background around it is transparent. A logo uploaded in Admin overrides it. */
 function logo(s) {
   const lu = safeUrl(s.logo_url);
   if (lu) return `<img class="logo__img" src="${h(lu)}" alt="${h(s.site_name)}">`;
-  return `<img class="logo__crest" src="/assets/brand/rockford-crest.webp" width="240" height="258" alt="">
-    <span class="logo__type"><span class="logo__name">Rockford</span><span class="logo__sub">English Academy</span></span>`;
+  return `<img class="logo__head" src="/assets/brand/rockford-logo.webp" width="640" height="711" alt="${h(s.site_name)}: English Academy">`;
 }
 
 /** Footer logo: the full crest with wordmark, banner and "Est. 2026". */
@@ -128,7 +128,7 @@ function page(ctx, o) {
 <meta name="description" content="${h(desc)}">
 ${o.noindex ? '<meta name="robots" content="noindex">' : ''}
 ${canonical && !o.noindex ? `<link rel="canonical" href="${h(canonical)}">` : ''}
-<meta name="theme-color" content="#14243B">
+<meta name="theme-color" content="#142747">
 <meta property="og:type" content="${h(o.type || 'website')}">
 <meta property="og:site_name" content="${h(s.site_name)}">
 <meta property="og:title" content="${h(o.title || s.site_name)}">
@@ -143,7 +143,7 @@ ${s.search_console_verification ? `<meta name="google-site-verification" content
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@300;400;500;600&family=Instrument+Serif&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/main.css?v=6">
+<link rel="stylesheet" href="/assets/css/main.css?v=7">
 ${introScript}
 ${analyticsHead(ctx)}
 ${ld}
