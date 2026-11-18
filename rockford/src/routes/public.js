@@ -1,6 +1,9 @@
 'use strict';
 /* Public pages. */
+const fs = require('node:fs');
+const path = require('node:path');
 const config = require('../config');
+const uploads = require('../uploads');
 const content = require('../content');
 const md = require('../markdown');
 const { page, abs } = require('../views/layout');
@@ -90,7 +93,22 @@ function register(app) {
   });
 
   r.get('/careers', (ctx) => renderers.careers(ctx));
-  r.get('/careers/:slug', (ctx) => {
+  /** Job flyer file download with a friendly file name (e.g. "English Tutor.docx"). */
+  r.get('/careers/flyers/:id/download', (ctx) => {
+    const f = /^\d{1,12}$/.test(ctx.params.id) ? content.flyer(Number(ctx.params.id)) : null;
+    if (!f || !uploads.flyerUrl(f.file)) return false;
+    const file = path.join(config.UPLOADS_DIR, f.file);
+    let st = null; try { st = fs.statSync(file); } catch { st = null; }
+    if (!st || !st.isFile()) return false;
+    const ext = path.extname(f.file);
+    const base = String(f.title).normalize('NFKD').replace(/[^A-Za-z0-9 ._()-]+/g, '').replace(/\s+/g, ' ').trim().slice(0, 80) || 'flyer';
+    ctx.res.writeHead(200, {
+      'Content-Type': f.mime || 'application/octet-stream', 'Content-Length': st.size,
+      'Content-Disposition': `attachment; filename="${base}${ext}"`, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'public, max-age=3600',
+    });
+    if (ctx.req.method === 'HEAD') return ctx.res.end();
+    fs.createReadStream(file).on('error', () => ctx.res.destroy()).pipe(ctx.res);
+  });  r.get('/careers/:slug', (ctx) => {
     const v = content.vacancy(ctx.params.slug);
     if (!v) return false;
     renderers.vacancy(ctx, v);

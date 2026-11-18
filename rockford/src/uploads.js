@@ -82,26 +82,46 @@ function deleteImage(rel) {
   try { fs.unlinkSync(path.join(config.UPLOADS_DIR, rel)); } catch { /* already gone */ }
 }
 
-/* ── Job flyers: an image (JPG/PNG/WebP) or a PDF, stored under public/uploads/flyers/YYYY/MM ── */
-const FLYER_REL = /^flyers\/\d{4}\/\d{2}\/[0-9a-f-]{36}\.(jpg|png|webp|pdf)$/;
+/* ── Job flyers: an image (JPG/PNG/WebP), a PDF or a Word document, stored under public/uploads/flyers/YYYY/MM ── */
+const FLYER_REL = /^flyers\/\d{4}\/\d{2}\/[0-9a-f-]{36}\.(jpg|png|webp|pdf|docx|doc)$/;
 const flyerUrl = (rel) => (FLYER_REL.test(String(rel)) ? `/uploads/${rel}` : '');
 
 function detectPdf(buf) {
   return buf.slice(0, 5).toString('latin1') === '%PDF-' ? { ext: '.pdf', mime: 'application/pdf' } : null;
 }
 
-/** kind is 'image' or 'pdf'. Returns { error } or { ok, kind: {ext, mime}, sha256 }. */
-function validateFlyerFile(file, kind) {
-  const label = kind === 'pdf' ? 'a PDF' : 'an image (JPG, PNG or WebP)';
-  if (!file || !file.data || !file.data.length) return { error: `Choose ${label} to upload.` };
-  if (file.data.length > config.flyerMaxBytes) return { error: `The file is too large. Flyers must be ${Math.round(config.flyerMaxBytes / 1048576)} MB or smaller.` };
-  const found = kind === 'pdf' ? detectPdf(file.data) : detectImage(file.data);
-  if (!found || (kind === 'pdf' && path.extname(file.filename || '').toLowerCase() !== '.pdf')) {
-    return { error: kind === 'pdf' ? 'That file is not a PDF. Choose a .pdf file, or change the flyer type.' : 'That file is not a JPG, PNG or WebP image. Choose an image, or change the flyer type.' };
-  }
-  return { ok: true, kind: found, sha256: crypto.createHash('sha256').update(file.data).digest('hex') };
+/** Word: .docx (zip with word/ parts, no macros) or legacy .doc (OLE2 header). Extension must match the content. */
+function detectWord(buf, filename) {
+  const ext = path.extname(filename || '').toLowerCase();
+  if (ext === '.docx') return detectCv(buf, 'x.docx');
+  if (ext === '.doc' && buf.slice(0, 8).equals(Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]))) return { ext: '.doc', mime: 'application/msword' };
+  return null;
 }
 
+const FLYER_TYPE_OF = { '.jpg': 'image', '.png': 'image', '.webp': 'image', '.pdf': 'pdf', '.docx': 'doc', '.doc': 'doc' };
+
+/**
+ * kind is 'image' | 'pdf' | 'doc' (the file must be exactly that) or 'file' (any of them, detected from the content).
+ * Returns { error } or { ok, kind: {ext, mime}, flyerKind: 'image'|'pdf'|'doc', sha256 }.
+ */
+function validateFlyerFile(file, kind) {
+  const label = { pdf: 'a PDF', doc: 'a Word document (.docx or .doc)', image: 'an image (JPG, PNG or WebP)' }[kind] || 'a file (an image, a PDF or a Word document)';
+  if (!file || !file.data || !file.data.length) return { error: `Choose ${label} to upload.` };
+  if (file.data.length > config.flyerMaxBytes) return { error: `The file is too large. Flyers must be ${Math.round(config.flyerMaxBytes / 1048576)} MB or smaller.` };
+  const name = file.filename || '';
+  const pdfOk = path.extname(name).toLowerCase() === '.pdf' ? detectPdf(file.data) : null;
+  const finders = { image: () => detectImage(file.data), pdf: () => pdfOk, doc: () => detectWord(file.data, name) };
+  const order = finders[kind] ? [kind] : ['image', 'pdf', 'doc'];
+  for (const k of order) {
+    const found = finders[k]();
+    if (found) return { ok: true, kind: found, flyerKind: FLYER_TYPE_OF[found.ext], sha256: crypto.createHash('sha256').update(file.data).digest('hex') };
+  }
+  return { error: {
+    pdf: 'That file is not a PDF. Choose a .pdf file, or change the flyer type.',
+    doc: 'That file is not a Word document. Choose a .docx or .doc file, or change the flyer type.',
+    image: 'That file is not a JPG, PNG or WebP image. Choose an image, or change the flyer type.',
+  }[kind] || 'That file type is not supported. Upload a JPG, PNG or WebP image, a PDF, or a Word document (.docx or .doc).' };
+}
 function saveFlyerFile(file, kind) {
   const d = new Date();
   const sub = `flyers/${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -120,5 +140,5 @@ function deleteFlyerFile(rel) {
 
 module.exports = {
   validateCv, saveCv, cvPath, deleteCv, validateImage, saveImage, deleteImage, detectCv, detectImage,
-  detectPdf, validateFlyerFile, saveFlyerFile, deleteFlyerFile, flyerUrl,
+  detectPdf, detectWord, validateFlyerFile, saveFlyerFile, deleteFlyerFile, flyerUrl,
 };

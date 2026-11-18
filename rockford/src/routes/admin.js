@@ -461,17 +461,24 @@ function register(app) {
     const errors = schema.validateFields(FLYER_FIELDS, f, {});
     const upload = files.find((x) => x.field === 'file');
     const selfId = row ? row.id : 0;
-    let check = null;
+    let check = null; let finalKind = f.kind;
     if (!errors.kind) {
       if (f.kind === 'text') {
         if (!f.body && !errors.body) errors.body = 'Enter the flyer text.';
       } else {
-        if (f.kind === 'image' && !f.alt && !errors.alt) errors.alt = 'Describe the image (alt text) so it is accessible.';
-        if (upload) { check = uploads.validateFlyerFile(upload, f.kind); if (check.error) errors.file = check.error; }
-        else if (!(row && row.kind === f.kind && row.file)) errors.file = f.kind === 'pdf' ? 'Choose a PDF to upload.' : 'Choose an image to upload.';
+        // 'file' = any image, PDF or Word document (detected from the file itself); image/pdf/doc = exactly that type.
+        const explicit = ['image', 'pdf', 'doc'].includes(f.kind) ? f.kind : '';
+        if (upload) {
+          check = uploads.validateFlyerFile(upload, f.kind);
+          if (check.error) errors.file = check.error; else finalKind = check.flyerKind;
+        } else if (row && row.kind !== 'text' && row.file && (!explicit || row.kind === explicit)) {
+          finalKind = row.kind;
+        } else {
+          errors.file = { image: 'Choose an image to upload.', pdf: 'Choose a PDF to upload.', doc: 'Choose a Word document to upload.' }[explicit] || 'Choose a file to upload: an image, a PDF or a Word document.';
+        }
+        if (finalKind === 'image' && !errors.file && !f.alt && !errors.alt) errors.alt = 'Describe the image (alt text) so it is accessible.';
       }
-    }
-    // Duplicate protection: same title, or the exact same file, cannot be added twice.
+    }    // Duplicate protection: same title, or the exact same file, cannot be added twice.
     if (!errors.title && q.get('SELECT id FROM flyers WHERE lower(title) = lower(?) AND id != ?', f.title, selfId)) {
       errors.title = 'A flyer with this title already exists. Edit that one, or choose a different title.';
     }
@@ -482,7 +489,7 @@ function register(app) {
     if (hasErrors(errors)) return flyerPage(ctx, row, f, errors, 422);
 
     const data = {
-      title: f.title, kind: f.kind, summary: f.summary, body: f.kind === 'text' ? f.body : '', alt: f.kind === 'image' ? f.alt : '',
+      title: f.title, kind: finalKind, summary: f.summary, body: finalKind === 'text' ? f.body : '', alt: finalKind === 'image' ? f.alt : '',
       deadline: f.deadline, status: f.status || 'draft', sort: Number(f.sort || 0),
     };
     let replaced = false;
@@ -490,7 +497,7 @@ function register(app) {
       const saved = uploads.saveFlyerFile(upload, check.kind);
       Object.assign(data, { file: saved.file, mime: saved.mime, size: saved.size, sha256: check.sha256, original_name: String(upload.filename || 'flyer').replace(/[^\w .()-]+/g, '_').slice(0, 200) });
       replaced = true;
-    } else if (f.kind === 'text') {
+    } else if (finalKind === 'text') {
       Object.assign(data, { file: '', mime: '', size: 0, sha256: '', original_name: '' });
       replaced = true;
     }

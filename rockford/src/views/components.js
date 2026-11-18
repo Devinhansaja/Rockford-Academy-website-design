@@ -65,7 +65,8 @@ function vacancyCard(v) {
 function flyerCard(f) {
   const url = f.file ? flyerUrl(f.file) : '';
   const closes = f.deadline ? `<span class="ev-card__date">Closes ${h(formatDate(f.deadline))}</span>` : '<span class="ev-card__date">Job flyer</span>';
-  const head = `<div class="ev-card__top">${closes}${pill(f.kind === 'pdf' ? 'PDF' : f.kind === 'image' ? 'Flyer' : 'Notice', 'pill--outline')}</div>
+  const dl = `/careers/flyers/${Number(f.id)}/download`; // sends the file with a friendly name
+  const head = `<div class="ev-card__top">${closes}${pill({ pdf: 'PDF', doc: 'Word', image: 'Flyer' }[f.kind] || 'Notice', 'pill--outline')}</div>
     <h3 class="ev-card__title">${h(f.title)}</h3>${f.summary ? `<p class="ev-card__text">${h(f.summary)}</p>` : ''}`;
   if (f.kind === 'image' && url) {
     return `<li class="flyer-card flyer-card--image reveal" data-kind="image">
@@ -78,7 +79,14 @@ function flyerCard(f) {
     return `<li class="flyer-card flyer-card--pdf reveal" data-kind="pdf">
     <div class="flyer-card__pdf" aria-hidden="true"><span>PDF</span></div>
     ${head}
-    <div class="flyer-card__actions"><a class="pill-btn pill-btn--navy pill-btn--sm" href="${h(url)}" target="_blank" rel="noopener" data-track="flyer_view" data-track-item="${h(String(f.id))}">Open PDF</a> <a class="pill-btn pill-btn--sm pill-btn--outline" href="${h(url)}" download>Download</a></div>
+    <div class="flyer-card__actions"><a class="pill-btn pill-btn--navy pill-btn--sm" href="${h(url)}" target="_blank" rel="noopener" data-track="flyer_view" data-track-item="${h(String(f.id))}">Open PDF</a> <a class="pill-btn pill-btn--sm pill-btn--outline" href="${h(dl)}">Download</a></div>
+  </li>`;
+  }
+  if (f.kind === 'doc' && url) {
+    return `<li class="flyer-card flyer-card--doc reveal" data-kind="doc">
+    <div class="flyer-card__pdf" aria-hidden="true"><span>WORD</span></div>
+    ${head}
+    <div class="flyer-card__actions"><a class="pill-btn pill-btn--navy pill-btn--sm" href="${h(dl)}" data-track="flyer_view" data-track-item="${h(String(f.id))}">Download document</a></div>
   </li>`;
   }
   return `<li class="flyer-card flyer-card--text reveal" data-kind="text">

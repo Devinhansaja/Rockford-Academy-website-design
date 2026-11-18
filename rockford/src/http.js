@@ -119,6 +119,7 @@ const MIME = {
   '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.avif': 'image/avif',
   '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8', '.json': 'application/json',
   '.pdf': 'application/pdf',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', '.doc': 'application/msword',
 };
 
 /** Serve a file from /public. Returns true if handled. Never serves dotfiles or escapes the folder. */
@@ -142,6 +143,7 @@ function serveStatic(req, res, urlPath) {
     'X-Content-Type-Options': 'nosniff',
   };
   if (type === MIME['.pdf']) headers['Content-Disposition'] = 'inline'; // open in the browser's PDF viewer
+  else if (/^application\/(msword|vnd\.openxml)/.test(type)) headers['Content-Disposition'] = 'attachment'; // Word files download
   if (req.headers['if-none-match'] === etag) { res.writeHead(304, headers); res.end(); return true; }
   res.writeHead(200, headers);
   if (req.method === 'HEAD') { res.end(); return true; }

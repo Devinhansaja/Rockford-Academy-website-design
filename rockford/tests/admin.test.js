@@ -314,7 +314,10 @@ test('admin panel', async (t) => {
   await t.test('job flyers: image, PDF and words-only flyers; validation; duplicates; publish; delete', async () => {
     const pub = new Client();
     const flyerDir = path.join(ROOT, 'public', 'uploads', 'flyers');
-    const filesOnDisk = () => (fs.existsSync(flyerDir) ? fs.readdirSync(flyerDir, { recursive: true }).filter((f) => /\.(png|jpg|webp|pdf)$/.test(f)).length : 0);
+    // Count only files these tests create (the folder may already hold real uploads from the dev server).
+    const countFiles = () => (fs.existsSync(flyerDir) ? fs.readdirSync(flyerDir, { recursive: true }).filter((f) => /\.(png|jpg|webp|pdf|docx|doc)$/.test(f)).length : 0);
+    const baseline = countFiles();
+    const filesOnDisk = () => countFiles() - baseline;
     const png = (n) => Buffer.concat([tinyPng(), Buffer.from(`variant-${n}`)]);
     const pdf = (n) => Buffer.concat([tinyPdf(), Buffer.from(`% variant ${n}\n`)]);
     const send = (url, fields, file) => {
@@ -470,7 +473,99 @@ test('admin panel', async (t) => {
     for (const id of [pdfRow.id, txt.id]) await admin.post(`/admin/flyers/${id}/delete`);
     assert.equal(row('SELECT COUNT(*) AS n FROM flyers').n, 0);
     assert.equal(filesOnDisk(), 0);
-    try { fs.rmSync(flyerDir, { recursive: true, force: true }); } catch { /* ignore */ }
+  });
+
+  await t.test('job flyers: one "Upload a file" option accepts image, PDF, Word (.docx and .doc)', async () => {
+    const pub = new Client();
+    const docx = (n) => Buffer.concat([Buffer.from([0x50, 0x4b, 0x03, 0x04]), Buffer.from(`[Content_Types].xml word/document.xml variant-${n}`)]);
+    const oleDoc = (n) => Buffer.concat([Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]), Buffer.from(`legacy word ${n}`)]);
+    const png = (n) => Buffer.concat([tinyPng(), Buffer.from(`auto-${n}`)]);
+    const pdf = (n) => Buffer.concat([tinyPdf(), Buffer.from(`% auto ${n}\n`)]);
+    const send = (url, fields, file) => {
+      const fd = new FormData();
+      fd.append('_csrf', admin.csrf);
+      for (const [k, v] of Object.entries(fields)) fd.append(k, v);
+      if (file) fd.append('file', new Blob([file.data], { type: file.type || 'application/octet-stream' }), file.name);
+      return admin.req('POST', url, { fd });
+    };
+    const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+    let r = await admin.get('/admin/flyers/new');
+    assert.match(r.text, /Upload a file \(image, PDF or Word document\)/);
+    assert.match(r.text, /accept="[^"]*\.docx[^"]*"/);
+    assert.doesNotMatch(r.text, /<option value="doc"/, 'the form offers just two choices');
+
+    /* The type is detected from the file itself */
+    const cases = [
+      ['auto image', { alt: 'Auto image flyer' }, { data: png(1), name: 'poster.png' }, 'image', 'image/png'],
+      ['auto pdf', {}, { data: pdf(1), name: 'details.pdf' }, 'pdf', 'application/pdf'],
+      ['auto docx', {}, { data: docx(1), name: 'Job Description.docx' }, 'doc', DOCX_MIME],
+      ['auto old doc', {}, { data: oleDoc(1), name: 'old.doc' }, 'doc', 'application/msword'],
+    ];
+    const made = {};
+    for (const [title, extra, file, kind, mime] of cases) {
+      r = await send('/admin/flyers/new', { kind: 'file', title, status: 'published', ...extra }, file);
+      assert.equal(r.status, 303, `${title}: ${r.text.slice(0, 300)}`);
+      const fl = row('SELECT * FROM flyers WHERE title = ?', title);
+      assert.equal(fl.kind, kind, title);
+      assert.equal(fl.mime, mime, title);
+      assert.ok(fs.existsSync(path.join(ROOT, 'public', 'uploads', fl.file)), title);
+      made[title] = fl;
+    }
+
+    /* Word flyers appear on Careers with a download link; the download has a friendly name */
+    const careers = (await pub.get('/careers')).text;
+    const docFlyer = made['auto docx'];
+    assert.match(careers, /flyer-card--doc/);
+    assert.ok(careers.includes(`href="/careers/flyers/${docFlyer.id}/download"`));
+    assert.match(careers, /Download document/);
+    let d = await pub.get(`/careers/flyers/${docFlyer.id}/download`);
+    assert.equal(d.status, 200);
+    assert.equal(d.headers.get('content-type'), DOCX_MIME);
+    assert.equal(d.headers.get('content-disposition'), 'attachment; filename="auto docx.docx"');
+    assert.deepEqual(d.buf, docx(1));
+    d = await pub.get(`/careers/flyers/${made['auto old doc'].id}/download`);
+    assert.equal(d.headers.get('content-type'), 'application/msword');
+    d = await pub.get(`/careers/flyers/${made['auto pdf'].id}/download`);
+    assert.match(d.headers.get('content-disposition'), /attachment; filename="auto pdf\.pdf"/);
+    d = await pub.get(`/uploads/${docFlyer.file}`);
+    assert.equal(d.status, 200);
+    assert.match(d.headers.get('content-disposition'), /attachment/, 'Word files are always downloaded, never rendered');
+
+    /* Rejected: unsupported, macro-enabled, mismatched extension, missing alt text for images */
+    const bad = async (fields, file, re, label) => {
+      const x = await send('/admin/flyers/new', { status: 'draft', ...fields }, file);
+      assert.equal(x.status, 422, `${label}: ${x.text.slice(0, 200)}`);
+      assert.match(x.text, re, label);
+    };
+    await bad({ kind: 'file', title: 'Text file' }, { data: Buffer.from('just some text'), name: 'notes.txt' }, /not supported/, 'plain text file');
+    await bad({ kind: 'file', title: 'Macro doc' }, { data: Buffer.concat([docx(9), Buffer.from('vbaProject.bin')]), name: 'macro.docx' }, /not supported/, 'macro-enabled Word file');
+    await bad({ kind: 'file', title: 'Docx as doc' }, { data: docx(10), name: 'wrong.doc' }, /not supported/, 'extension does not match the content');
+    await bad({ kind: 'file', title: 'Exe renamed' }, { data: Buffer.from('MZ\x90\x00 fake exe'), name: 'x.docx' }, /not supported/, 'executable renamed to .docx');
+    await bad({ kind: 'file', title: 'Image no alt' }, { data: png(2), name: 'a.png' }, /alt text/i, 'image without alt');
+    await bad({ kind: 'file', title: 'Nothing' }, null, /Choose a file to upload/, 'no file');
+    await bad({ kind: 'doc', title: 'PDF as Word' }, { data: pdf(2), name: 'x.pdf' }, /not a Word document/, 'explicit Word type with a PDF');
+    await bad({ kind: 'file', title: 'auto DOCX' }, { data: docx(3), name: 'dup.docx' }, /already exists/, 'duplicate title');
+    await bad({ kind: 'file', title: 'Same docx again' }, { data: docx(1), name: 'again.docx' }, /already uploaded as “auto docx”/, 'duplicate file');
+
+    /* Edit: replace an image with a Word document in place (old file deleted); draft download is hidden */
+    const img = made['auto image'];
+    r = await send(`/admin/flyers/${img.id}`, { kind: 'file', title: 'auto image', status: 'published' }, { data: docx(4), name: 'now-word.docx' });
+    assert.equal(r.status, 303, r.text.slice(0, 300));
+    const swapped = row('SELECT * FROM flyers WHERE id = ?', img.id);
+    assert.equal(swapped.kind, 'doc');
+    assert.equal(swapped.alt, '');
+    assert.ok(!fs.existsSync(path.join(ROOT, 'public', 'uploads', img.file)), 'old image deleted');
+    r = await admin.get(`/admin/flyers/${img.id}`);
+    assert.match(r.text, /Current file/);
+    assert.match(r.text, /<option value="file" selected>/, 'edit form shows the single upload option');
+    await admin.post(`/admin/flyers/${img.id}/status`, { status: 'draft' });
+    assert.equal((await pub.get(`/careers/flyers/${img.id}/download`)).status, 404, 'draft flyers cannot be downloaded');
+    assert.equal((await pub.get('/careers/flyers/99999/download')).status, 404);
+    assert.equal((await pub.get('/careers/flyers/abc/download')).status, 404);
+
+    for (const fl of Object.values(made)) await admin.post(`/admin/flyers/${fl.id}/delete`);
+    assert.equal(row('SELECT COUNT(*) AS n FROM flyers').n, 0);
   });
 
   await t.test('duplicate titles are refused for programmes, vacancies and articles', async () => {

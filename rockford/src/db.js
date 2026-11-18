@@ -191,7 +191,34 @@ const MIGRATIONS = [
   );
   CREATE INDEX idx_flyers_sha ON flyers(sha256);
   `,
+  /* 3: flyers can also be Word documents (rebuild the table to widen the kind check) */
+  `
+  CREATE TABLE flyers_new (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('image','pdf','doc','text')),
+    summary TEXT NOT NULL DEFAULT '',
+    body TEXT NOT NULL DEFAULT '',
+    file TEXT NOT NULL DEFAULT '',
+    original_name TEXT NOT NULL DEFAULT '',
+    mime TEXT NOT NULL DEFAULT '',
+    size INTEGER NOT NULL DEFAULT 0,
+    sha256 TEXT NOT NULL DEFAULT '',
+    alt TEXT NOT NULL DEFAULT '',
+    deadline TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','published')),
+    sort INTEGER NOT NULL DEFAULT 0,
+    published_at INTEGER,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  );
+  INSERT INTO flyers_new SELECT id, title, kind, summary, body, file, original_name, mime, size, sha256, alt, deadline, status, sort, published_at, created_at, updated_at FROM flyers;
+  DROP TABLE flyers;
+  ALTER TABLE flyers_new RENAME TO flyers;
+  CREATE INDEX idx_flyers_sha ON flyers(sha256);
+  `,
 ];
+
 
 function migrate() {
   const current = db.prepare('PRAGMA user_version').get().user_version;

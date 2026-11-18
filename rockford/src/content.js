@@ -17,6 +17,8 @@ module.exports = {
 
   /** Published job flyers whose closing date (if any) has not passed. */
   flyers: () => q.all("SELECT * FROM flyers WHERE status = 'published' AND (deadline = '' OR deadline >= ?) ORDER BY sort ASC, COALESCE(published_at, created_at) DESC, id DESC", todayColombo()),
+  /** A published flyer that has a file (for the download link). */
+  flyer: (id) => q.get("SELECT * FROM flyers WHERE status = 'published' AND file <> '' AND id = ?", id),
   todayColombo,
 
   testimonials: () => q.all("SELECT * FROM testimonials WHERE status = 'published' AND consent_confirmed = 1 AND approved_by <> '' ORDER BY sort ASC, id DESC"),
