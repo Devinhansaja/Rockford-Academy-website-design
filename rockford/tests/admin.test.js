@@ -75,7 +75,7 @@ const row = (sql, ...p) => db.q.get(sql, ...p);
 
 /* ── Server lifecycle ────────────────────────────────────────── */
 before(async () => {
-  const env = { ...process.env, DATA_DIR, NODE_ENV: 'development', HOST: '127.0.0.1', MAIL_TRANSPORT: 'outbox', SITE_URL: '' };
+  const env = { ...process.env, DATA_DIR, NODE_ENV: 'development', HOST: '127.0.0.1', MAIL_TRANSPORT: 'outbox', SITE_URL: '', ADMIN_SCOPE: 'full' };
   const made = spawnSync(process.execPath, ['scripts/create-admin.js', '--name', ADMIN.name, '--email', ADMIN.email, '--password', ADMIN.password], { cwd: ROOT, env, encoding: 'utf8' });
   assert.equal(made.status, 0, made.stderr);
   const weak = spawnSync(process.execPath, ['scripts/create-admin.js', '--name', 'X', '--email', 'x@example.test', '--password', 'short'], { cwd: ROOT, env, encoding: 'utf8' });

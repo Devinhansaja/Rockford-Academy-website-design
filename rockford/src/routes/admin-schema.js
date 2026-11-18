@@ -151,7 +151,7 @@ const ENTITIES = [
     quick: { published: 'Publish', draft: 'Unpublish' },
   },
   {
-    key: 'vacancies', table: 'vacancies', area: 'recruitment', label: 'Vacancies', singular: 'Vacancy', slug: true,
+    key: 'vacancies', table: 'vacancies', area: 'jobs', label: 'Vacancies', singular: 'Vacancy', slug: true,
     intro: 'Job openings. Only open vacancies are shown on the Careers page and accept applications.',
     defaults: { status: 'draft', employment_type: 'Full-time' },
     fields: [

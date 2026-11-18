@@ -54,6 +54,7 @@ module.exports = {
   port: num('PORT', 3000),
   host: env('HOST', '127.0.0.1'),
   siteUrl: (env('SITE_URL', '') || '').replace(/\/+$/, ''), // canonical origin, e.g. https://rockfordacademy.com
+  adminScope: /^full$/i.test(env('ADMIN_SCOPE', 'jobs')) ? 'full' : 'jobs', // 'jobs' = admin manages only vacancies + job flyers
   trustProxy: bool('TRUST_PROXY', false),
   cookieSecure: bool('COOKIE_SECURE', isProd),
   secret,

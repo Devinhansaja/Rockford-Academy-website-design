@@ -6,16 +6,25 @@
  *   recruiter  – vacancies and job applications (incl. CV download)
  */
 const security = require('./security');
+const config = require('./config');
 
 const CAN = {
+  jobs: ['admin', 'recruiter'], // vacancies and job flyers
   content: ['admin', 'editor'],
   enquiries: ['admin', 'editor'],
-  recruitment: ['admin', 'recruiter'],
+  recruitment: ['admin', 'recruiter'], // job applications and CVs
   settings: ['admin'],
   users: ['admin'],
 };
 
-const can = (session, area) => !!session && !session.pending_2fa && (CAN[area] || []).includes(session.role);
+/*
+ * ADMIN_SCOPE (see .env.example):
+ *   jobs (default) – the admin manages ONLY vacancies and job flyers (add, publish, remove).
+ *   full           – every admin section (programmes, news, applications, settings, users, …).
+ */
+const can = (session, area) => !!session && !session.pending_2fa
+  && (config.adminScope === 'full' || area === 'jobs')
+  && (CAN[area] || []).includes(session.role);
 
 /** Middleware: require a fully signed-in user (2FA completed). */
 function requireLogin(ctx) {

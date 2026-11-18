@@ -168,8 +168,8 @@ function register(app) {
     const s = ctx.session;
     const n = (sql, ...p) => q.get(sql, ...p).n;
     const counts = [];
-    if (can(s, 'recruitment')) {
-      counts.push({ label: 'New applications', value: n("SELECT COUNT(*) AS n FROM applications WHERE status = 'received'"), href: '/admin/applications?status=received' });
+    if (can(s, 'recruitment')) counts.push({ label: 'New applications', value: n("SELECT COUNT(*) AS n FROM applications WHERE status = 'received'"), href: '/admin/applications?status=received' });
+    if (can(s, 'jobs')) {
       counts.push({ label: 'Open vacancies', value: n("SELECT COUNT(*) AS n FROM vacancies WHERE status = 'open'"), href: '/admin/vacancies' });
       counts.push({ label: 'Published job flyers', value: n("SELECT COUNT(*) AS n FROM flyers WHERE status = 'published'"), href: '/admin/flyers' });
     }
@@ -273,7 +273,7 @@ function register(app) {
       let extra = '';
       if (def.key === 'vacancies') {
         const c = q.get('SELECT COUNT(*) AS n FROM applications WHERE vacancy_id = ?', row.id).n;
-        extra = `<p><a href="/admin/applications?vacancy=${row.id}">${c} application${c === 1 ? '' : 's'}</a></p>`;
+        extra = can(s, 'recruitment') ? `<p><a href="/admin/applications?vacancy=${row.id}">${c} application${c === 1 ? '' : 's'}</a></p>` : '';
       }
       return `<div class="panel"><h2>Status</h2><p>Currently ${ui.statusBadge(row.status)}</p>${extra}<div class="button-row">${quickButtons(def, row, s)}</div></div>`;
     };
@@ -337,6 +337,7 @@ function register(app) {
 
   /* ── Applications ──────────────────────────────────────────── */
   const recruit = requireArea('recruitment');
+  const jobs = requireArea('jobs');
   const likeEsc = (s) => `%${s.replace(/[\\%_]/g, (c) => '\\' + c)}%`;
 
   /**
@@ -509,12 +510,12 @@ function register(app) {
     ctx.redirect(`/admin/flyers/${id}?${row ? 'saved' : 'created'}=1`);
   }
 
-  get('/admin/flyers', recruit, (ctx) => ctx.html(flyerViews.listPage(ctx, { rows: q.all("SELECT * FROM flyers ORDER BY CASE status WHEN 'published' THEN 0 ELSE 1 END, sort, updated_at DESC") })));
-  get('/admin/flyers/new', recruit, (ctx) => flyerPage(ctx, null, { ...flyerNew }, {}));
-  post('/admin/flyers/new', recruit, flyerBody, csrf, (ctx) => saveFlyer(ctx, null));
-  get('/admin/flyers/:id', recruit, loadRow('flyers'), (ctx) => flyerPage(ctx, ctx.row, flyerValues(ctx.row), {}));
-  post('/admin/flyers/:id', recruit, loadRow('flyers'), flyerBody, csrf, (ctx) => saveFlyer(ctx, ctx.row));
-  post('/admin/flyers/:id/status', recruit, csrf, loadRow('flyers'), async (ctx) => {
+  get('/admin/flyers', jobs, (ctx) => ctx.html(flyerViews.listPage(ctx, { rows: q.all("SELECT * FROM flyers ORDER BY CASE status WHEN 'published' THEN 0 ELSE 1 END, sort, updated_at DESC") })));
+  get('/admin/flyers/new', jobs, (ctx) => flyerPage(ctx, null, { ...flyerNew }, {}));
+  post('/admin/flyers/new', jobs, flyerBody, csrf, (ctx) => saveFlyer(ctx, null));
+  get('/admin/flyers/:id', jobs, loadRow('flyers'), (ctx) => flyerPage(ctx, ctx.row, flyerValues(ctx.row), {}));
+  post('/admin/flyers/:id', jobs, loadRow('flyers'), flyerBody, csrf, (ctx) => saveFlyer(ctx, ctx.row));
+  post('/admin/flyers/:id/status', jobs, csrf, loadRow('flyers'), async (ctx) => {
     const r = ctx.row; const to = schema.str((await fieldsOf(ctx)).status);
     if (!['draft', 'published'].includes(to)) return ctx.text('Unknown status', 400);
     q.run('UPDATE flyers SET status = ?, published_at = COALESCE(published_at, ?), updated_at = ? WHERE id = ?', to, to === 'published' ? now() : null, now(), r.id);
@@ -522,7 +523,7 @@ function register(app) {
     const back = ctx.req.headers.referer && /\/admin\/flyers\/\d+$/.test(new URL(ctx.req.headers.referer, 'http://x').pathname) ? `/admin/flyers/${r.id}` : '/admin/flyers';
     ctx.redirect(`${back}?status=1`);
   });
-  post('/admin/flyers/:id/delete', recruit, csrf, loadRow('flyers'), (ctx) => {
+  post('/admin/flyers/:id/delete', jobs, csrf, loadRow('flyers'), (ctx) => {
     const r = ctx.row;
     q.run('DELETE FROM flyers WHERE id = ?', r.id);
     uploads.deleteFlyerFile(r.file);

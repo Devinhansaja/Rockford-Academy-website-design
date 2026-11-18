@@ -12,6 +12,8 @@ Sign in at **`https://<your-domain>/admin`**. You only see the sections your rol
 
 ## Everyday tasks
 
+> **Admin scope.** By default (`ADMIN_SCOPE=jobs`) the admin manages only **Vacancies** and **Job Flyers**: add, publish/unpublish and remove. The sections below for programmes, news, applications, settings and users are hidden and blocked. Set `ADMIN_SCOPE=full` in the server `.env` to bring them all back.
+
 ### Publish a programme
 1. *Programmes → New programme*.
 2. Fill in only confirmed information. Empty fields are simply not shown on the website (nothing says "TBC").
