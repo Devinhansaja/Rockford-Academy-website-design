@@ -45,23 +45,14 @@ document.addEventListener('submit', function (e) {
 
 const DEMO = { email: 'demo@rockford.test', password: 'demo-password-2026' };
 
-const ADMIN_DEMO = `<div id="demo-bar" role="status" style="position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:9999;max-width:92vw;padding:10px 18px;border-radius:999px;background:#142747;color:#fff;font:600 13px/1.4 Inter,Arial,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3);text-align:center">Demo admin: click around freely. Nothing is saved.</div>
+const ADMIN_DEMO = `<div id="demo-bar" role="status" style="position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:9999;max-width:92vw;padding:10px 18px;border-radius:999px;background:#142747;color:#fff;font:600 13px/1.4 Inter,Arial,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.3);text-align:center"><span id="demo-msg">Demo admin: what you add or delete here shows on the website (this browser only).</span> <a href="#" data-demo-reset style="color:#C99A43;margin-left:8px">Reset demo</a></div>
 <script>
 (function () {
-  var bar = document.getElementById('demo-bar'), base = bar.textContent, timer;
-  function say(m) { bar.textContent = m; bar.style.background = '#C99A43'; bar.style.color = '#142747'; clearTimeout(timer);
-    timer = setTimeout(function () { bar.textContent = base; bar.style.background = '#142747'; bar.style.color = '#fff'; }, 3500); }
   document.addEventListener('submit', function (e) {
-    var f = e.target, a = f.getAttribute('action') || '';
-    e.preventDefault(); e.stopImmediatePropagation();
-    if (a === '/admin/login') { location.href = '/admin'; return; }
-    if (a === '/admin/logout') { location.href = '/admin/login'; return; }
-    say('Demo only: that change was not saved.');
+    var a = e.target.getAttribute('action') || '';
+    if (a === '/admin/login') { e.preventDefault(); e.stopImmediatePropagation(); location.href = '/admin'; }
+    else if (a === '/admin/logout') { e.preventDefault(); e.stopImmediatePropagation(); location.href = '/admin/login'; }
   }, true);
-  document.addEventListener('click', function (e) {
-    var l = e.target.closest && e.target.closest('a[data-demo-unavailable]');
-    if (l) { e.preventDefault(); say('That page is not part of the demo.'); }
-  });
   document.addEventListener('DOMContentLoaded', function () {
     var f = document.querySelector('form[action="/admin/login"]');
     if (!f) return;
@@ -73,6 +64,23 @@ const ADMIN_DEMO = `<div id="demo-bar" role="status" style="position:fixed;left:
 })();
 </script>`.replace('__EMAIL__', DEMO.email).replace('__PASSWORD__', DEMO.password);
 
+const DEMO_TAG = '<script src="/assets/js/demo.js" defer></script>';
+
+/** Sample data handed to the browser demo script (what the demo admin starts with). */
+function buildSeed() {
+  const { q } = require('../src/db');
+  const arr = (s) => { try { return JSON.parse(s || '[]'); } catch { return []; } };
+  return {
+    vacancies: q.all('SELECT * FROM vacancies ORDER BY id').map((v) => ({
+      id: v.id, slug: v.slug, title: v.title, summary: v.summary, description: v.description, responsibilities: arr(v.responsibilities), qualifications: arr(v.qualifications),
+      employment_type: v.employment_type, location: v.location, category: v.category, deadline: v.deadline, status: v.status, created: v.created_at,
+    })),
+    flyers: q.all('SELECT * FROM flyers ORDER BY id').map((f) => ({
+      id: f.id, kind: f.kind, title: f.title, summary: f.summary, body: f.body, fileUrl: f.file ? `/uploads/${f.file}` : '', fileName: f.original_name, size: f.size, mime: f.mime,
+      sha: f.sha256, alt: f.alt, deadline: f.deadline, status: f.status, sort: f.sort, created: f.created_at,
+    })),
+  };
+}
 /** Fill the throwaway database with a demo admin plus sample vacancies and flyers (never real data). */
 function seedDemo() {
   const crypto = require('node:crypto');
@@ -121,10 +129,7 @@ async function exportAdmin(base) {
   const cookie = r.headers.getSetCookie().map((c) => c.split(';')[0]).find((c) => c.startsWith('rf_session='));
   if (!cookie) throw new Error('Demo admin login failed while exporting the admin demo.');
 
-  const { q } = require('../src/db');
   const paths = ['/admin', '/admin/vacancies', '/admin/vacancies/new', '/admin/flyers', '/admin/flyers/new', '/admin/account'];
-  for (const v of q.all('SELECT id FROM vacancies')) paths.push(`/admin/vacancies/${v.id}`);
-  for (const f of q.all('SELECT id FROM flyers')) paths.push(`/admin/flyers/${f.id}`);
   const have = new Set(['/admin/login', ...paths]);
 
   const pages = [['/admin/login', loginHtml]];
@@ -137,7 +142,7 @@ async function exportAdmin(base) {
     const html = raw
       .replace(/(name="(?:_csrf|_token)" value=")[^"]*"/g, '$1demo"')
       .replace(/<a ([^>]*?)href="(\/admin[^"#?]*)([^"]*)"/g, (m, pre, href, rest) => (have.has(href) ? m : `<a ${pre}href="#" data-demo-unavailable`))
-      .replace('</body>', `${ADMIN_DEMO}\n</body>`);
+      .replace('</body>', `${ADMIN_DEMO}\n${DEMO_TAG}\n</body>`);
     const file = path.join(OUT, toFile(p));
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, html);
@@ -165,6 +170,11 @@ async function main() {
   const demoFiles = seedDemo();
   for (const f of demoFiles) { const dst = path.join(OUT, 'uploads', f.rel); fs.mkdirSync(path.dirname(dst), { recursive: true }); fs.writeFileSync(dst, f.data); }
 
+  const demoSrc = fs.readFileSync(path.join(__dirname, 'demo-assets', 'demo.js'), 'utf8');
+  if (!demoSrc.includes('/*__SEED__*/ { vacancies: [], flyers: [] }')) throw new Error('demo.js seed placeholder not found');
+  fs.writeFileSync(path.join(OUT, 'assets', 'js', 'demo.js'), demoSrc.replace('/*__SEED__*/ { vacancies: [], flyers: [] }', () => JSON.stringify(buildSeed())));
+  let jobTemplate = '';
+
   const queue = ['/', '/about', '/our-approach', '/programmes', '/careers', '/contact', '/news', '/privacy-policy', '/terms'];
   const seen = new Set();
   let pages = 0;
@@ -182,11 +192,19 @@ async function main() {
     }
     html = html.replace(/<form class="form" method="post"/g, '<form class="form" method="post" data-static-preview')
       .replace('</body>', `${PREVIEW_SCRIPT}\n</body>`);
+    // The real site sends flyer files through /careers/flyers/:id/download; the static preview links the file itself.
+    const flyerFiles = new Map(require('../src/db').q.all('SELECT id, file FROM flyers').map((f) => [String(f.id), f.file]));
+    html = html.replace(/href="\/careers\/flyers\/(\d+)\/download"/g, (m, id) => (flyerFiles.get(id) ? `href="/uploads/${flyerFiles.get(id)}" download` : m));
+    if (p === '/careers/english-tutor-sample') jobTemplate = html;
+    if (p === '/' || p === '/careers') html = html.replace('</body>', `${DEMO_TAG}\n</body>`);
     const file = path.join(OUT, toFile(p));
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, html);
     pages++;
   }
+
+  if (!jobTemplate) throw new Error('Could not find the sample vacancy page to use as the demo vacancy template.');
+  fs.writeFileSync(path.join(OUT, 'careers', 'job.html'), jobTemplate.replace('</body>', `${DEMO_TAG}\n</body>`));
 
   const adminPages = await exportAdmin(base);
 

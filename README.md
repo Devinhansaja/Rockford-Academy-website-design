@@ -23,10 +23,7 @@ Then open http://localhost:3000. Create the first admin account with `npm run cr
 
 Vercel builds a **static preview** of the public pages (`vercel.json` → `rockford/scripts/export-static.js`).
 Forms do not work there, because they need a server with a disk for the database and CVs.
-The admin is included as a **clickable demo** at `/admin/login` (the demo login is pre-filled): it shows the real
-admin screens with sample vacancies and flyers, but nothing can be saved. The sample content is added only to the
-throwaway database used for the export (sample files live in `rockford/scripts/demo-assets/`).
-For the live site, run the Node server on a VPS or Node host. See [`rockford/docs/DEPLOY.md`](rockford/docs/DEPLOY.md).
+The admin is included as a **clickable demo** at `/admin/login` (the demo login is pre-filled). It works without a server: vacancies and flyers added, edited or deleted in the demo admin (including image, PDF and Word flyers) are kept in the visitor's own browser, and the home page, Careers page and vacancy pages redraw from them, so a client can see a change appear on the site. Nothing is sent anywhere or shared between visitors, and the demo has a Reset button. The sample content is added only to the throwaway database used for the export (sample files and the demo script live in `rockford/scripts/demo-assets/`).
 
 ## Tests
 
