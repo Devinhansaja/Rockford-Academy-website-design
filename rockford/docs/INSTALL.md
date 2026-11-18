@@ -23,7 +23,7 @@ Edit `.env`:
 | `HOST`, `PORT` | Where Node listens. Keep `127.0.0.1` behind a reverse proxy |
 | `TRUST_PROXY`, `COOKIE_SECURE` | `true` behind HTTPS reverse proxies |
 | `DATA_DIR` | Database, CVs and backups. Must **not** be inside `public/` |
-| `CV_MAX_MB`, `IMAGE_MAX_MB` | Upload size limits |
+| `CV_MAX_MB`, `IMAGE_MAX_MB`, `FLYER_MAX_MB` | Upload size limits (CVs, images, job flyers) |
 | `MAIL_TRANSPORT` | `outbox` (no delivery; saved to `storage/outbox`) or `smtp` |
 | `MAIL_FROM`, `SMTP_*` | SMTP details from Google Workspace / Microsoft 365 / your email provider |
 

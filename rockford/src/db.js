@@ -168,6 +168,29 @@ const MIGRATIONS = [
     created_at INTEGER NOT NULL
   );
   `,
+  /* 2: job flyers (an image, a PDF or typed words), shown on the Careers page */
+  `
+  CREATE TABLE flyers (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('image','pdf','text')),
+    summary TEXT NOT NULL DEFAULT '',
+    body TEXT NOT NULL DEFAULT '',
+    file TEXT NOT NULL DEFAULT '',
+    original_name TEXT NOT NULL DEFAULT '',
+    mime TEXT NOT NULL DEFAULT '',
+    size INTEGER NOT NULL DEFAULT 0,
+    sha256 TEXT NOT NULL DEFAULT '',
+    alt TEXT NOT NULL DEFAULT '',
+    deadline TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','published')),
+    sort INTEGER NOT NULL DEFAULT 0,
+    published_at INTEGER,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+  );
+  CREATE INDEX idx_flyers_sha ON flyers(sha256);
+  `,
 ];
 
 function migrate() {

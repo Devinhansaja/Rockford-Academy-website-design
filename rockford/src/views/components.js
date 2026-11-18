@@ -1,6 +1,8 @@
 'use strict';
 /* Shared public view helpers. Every value is escaped with h(). */
 const { h, safeUrl, formToken } = require('../security');
+const md = require('../markdown');
+const { flyerUrl } = require('../uploads');
 
 /** Responsive <img> for an image object { src, alt, stock }. Unsplash sources get a srcset. */
 function picture(img, { eager = false, sizes = '(min-width: 900px) 50vw, 100vw', cls = 'ph__img' } = {}) {
@@ -59,6 +61,32 @@ function vacancyCard(v) {
   </li>`;
 }
 
+/** Job flyer card: an image, a PDF or typed words (all values escaped; file URLs come from flyerUrl()). */
+function flyerCard(f) {
+  const url = f.file ? flyerUrl(f.file) : '';
+  const closes = f.deadline ? `<span class="ev-card__date">Closes ${h(formatDate(f.deadline))}</span>` : '<span class="ev-card__date">Job flyer</span>';
+  const head = `<div class="ev-card__top">${closes}${pill(f.kind === 'pdf' ? 'PDF' : f.kind === 'image' ? 'Flyer' : 'Notice', 'pill--outline')}</div>
+    <h3 class="ev-card__title">${h(f.title)}</h3>${f.summary ? `<p class="ev-card__text">${h(f.summary)}</p>` : ''}`;
+  if (f.kind === 'image' && url) {
+    return `<li class="flyer-card flyer-card--image reveal" data-kind="image">
+    <a class="flyer-card__media" href="${h(url)}" target="_blank" rel="noopener" aria-label="Open the full flyer: ${h(f.title)}"><img src="${h(url)}" alt="${h(f.alt || f.title)}" loading="lazy" decoding="async"></a>
+    ${head}
+    <a class="pill-btn pill-btn--navy pill-btn--sm" href="${h(url)}" target="_blank" rel="noopener" data-track="flyer_view" data-track-item="${h(String(f.id))}">View full flyer</a>
+  </li>`;
+  }
+  if (f.kind === 'pdf' && url) {
+    return `<li class="flyer-card flyer-card--pdf reveal" data-kind="pdf">
+    <div class="flyer-card__pdf" aria-hidden="true"><span>PDF</span></div>
+    ${head}
+    <div class="flyer-card__actions"><a class="pill-btn pill-btn--navy pill-btn--sm" href="${h(url)}" target="_blank" rel="noopener" data-track="flyer_view" data-track-item="${h(String(f.id))}">Open PDF</a> <a class="pill-btn pill-btn--sm pill-btn--outline" href="${h(url)}" download>Download</a></div>
+  </li>`;
+  }
+  return `<li class="flyer-card flyer-card--text reveal" data-kind="text">
+    ${head}
+    <div class="prose flyer-card__body">${md.render(f.body)}</div>
+  </li>`;
+}
+
 function articleCard(a) {
   return `<article class="pub-card reveal" data-category="${h(a.category || '')}">
     <a class="pub-card__media" href="/news/${h(a.slug)}" tabindex="-1" aria-hidden="true">${photo(a.image_url ? { src: a.image_url, alt: a.image_alt } : null)}</a>
@@ -94,4 +122,4 @@ function errorSummary(errors) {
   return `<div class="form-alert" role="alert" tabindex="-1" id="form-errors"><p><strong>${errors.form ? h(errors.form) : 'Please check the form.'}</strong></p>${keys.filter((k) => k !== 'form').length ? `<ul>${keys.filter((k) => k !== 'form').map((k) => `<li><a href="#f-${h(k)}">${h(errors[k])}</a></li>`).join('')}</ul>` : ''}</div>`;
 }
 
-module.exports = { picture, photo, pill, programmeCard, vacancyCard, articleCard, formatDate, field, antiSpam, errorSummary, AVAILABILITY };
+module.exports = { picture, photo, pill, programmeCard, vacancyCard, flyerCard, articleCard, formatDate, field, antiSpam, errorSummary, AVAILABILITY };

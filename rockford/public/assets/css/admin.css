@@ -240,3 +240,7 @@ tbody tr:hover { background: #FAFBFD; }
   tbody td::before { content: attr(data-label) ": "; font-weight: 600; color: var(--slate); font-size: .82rem; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+
+/* Job flyers form */
+.current-file { margin-bottom: 14px; }
+.current-file img { display: block; margin-top: 8px; max-width: 240px; height: auto; border: 1px solid var(--line, #d9dee7); border-radius: 8px; }

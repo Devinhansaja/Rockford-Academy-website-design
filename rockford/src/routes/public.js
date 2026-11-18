@@ -66,7 +66,7 @@ const renderers = {
     }, status);
   },
   careers(ctx, form = {}, status = 200) {
-    render(ctx, { title: 'Careers: join our team', description: ctx.settings.home_careers_lede, path: '/careers', current: '/careers', main: P.careers(ctx, { vacancies: content.vacancies(), form }) }, status);
+    render(ctx, { title: 'Careers: join our team', description: ctx.settings.home_careers_lede, path: '/careers', current: '/careers', main: P.careers(ctx, { vacancies: content.vacancies(), flyers: content.flyers(), form }) }, status);
   },
 };
 

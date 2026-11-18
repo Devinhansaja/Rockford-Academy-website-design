@@ -99,6 +99,15 @@ function slugCheck(table) {
     if (q.get(`SELECT id FROM ${table} WHERE slug = ? AND id != ?`, form.slug, row ? row.id : 0)) errors.slug = 'Another item already uses this URL slug. Choose a different one.';
   };
 }
+/** Block a second item with the same title (case-insensitive) so the same thing is never listed twice. */
+function titleUnique(table, noun) {
+  return (form, errors, row) => {
+    if (!form.title || errors.title) return;
+    if (q.get(`SELECT id FROM ${table} WHERE lower(title) = lower(?) AND id != ?`, form.title, row ? row.id : 0)) {
+      errors.title = `Another ${noun} already has this title. Edit that one instead, or choose a different title.`;
+    }
+  };
+}
 const altCheck = (form, errors) => { if (form.image_url && !form.image_alt && !errors.image_alt) errors.image_alt = 'Describe the image (alt text) so it is accessible.'; };
 /** Set published_at the first time something goes live. */
 const firstPublished = (liveStatus) => (data, row) => {
@@ -133,7 +142,7 @@ const ENTITIES = [
       ...imageFields,
       ...seoFields,
     ],
-    validate: [slugCheck('programmes'), altCheck],
+    validate: [slugCheck('programmes'), titleUnique('programmes', 'programme'), altCheck],
     listSql: 'SELECT * FROM programmes ORDER BY sort, title COLLATE NOCASE',
     listColumns: [
       { label: 'Title', render: titleCell('programmes') }, statusCol,
@@ -160,7 +169,7 @@ const ENTITIES = [
       { name: 'status', label: 'Status', type: 'select', options: statusOpts(['draft', 'open', 'closed', 'archived']), hint: 'Open = visible and accepting applications. Closed = visible but not accepting. Archived = hidden.' },
       ...seoFields,
     ],
-    validate: [slugCheck('vacancies')],
+    validate: [slugCheck('vacancies'), titleUnique('vacancies', 'vacancy')],
     beforeSave: firstPublished('open'),
     listSql: `SELECT v.*, (SELECT COUNT(*) FROM applications a WHERE a.vacancy_id = v.id) AS app_count FROM vacancies v
               ORDER BY CASE v.status WHEN 'open' THEN 0 WHEN 'draft' THEN 1 WHEN 'closed' THEN 2 ELSE 3 END, v.updated_at DESC`,
@@ -190,7 +199,7 @@ const ENTITIES = [
       pubDateField,
       ...seoFields,
     ],
-    validate: [slugCheck('articles'), altCheck],
+    validate: [slugCheck('articles'), titleUnique('articles', 'article'), altCheck],
     beforeSave: firstPublished('published'),
     listSql: 'SELECT * FROM articles ORDER BY COALESCE(published_at, created_at) DESC',
     listColumns: [
@@ -287,7 +296,7 @@ const HOME_KEYS = Object.keys(settings.DEFAULTS).filter((k) => k.startsWith('hom
 
 const IMAGE_SLOTS = [
   ['hero', 'Homepage hero'], ['journey1', 'Journey – step 1'], ['journey2', 'Journey – step 2'], ['journey3', 'Journey – step 3'],
-  ['difference', 'The Rockford difference'], ['programmes', 'Programmes section'], ['about', 'About section'],
+  ['programmes', 'Programmes section'], ['about', 'About section'],
   ['approach', 'Our approach'], ['careers', 'Careers section'],
 ];
 const GALLERY_COUNT = 4;

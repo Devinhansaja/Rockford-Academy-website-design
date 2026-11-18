@@ -55,6 +55,19 @@
       });
     });
 
+    // Job flyer form: show only the fields that fit the chosen flyer type (image / pdf / text)
+    var flyerForm = document.querySelector('[data-flyer-form]');
+    if (flyerForm) {
+      var kindSelect = flyerForm.querySelector('#f-kind');
+      var showFor = function () {
+        Array.prototype.forEach.call(flyerForm.querySelectorAll('[data-kind-show]'), function (box) {
+          var on = box.getAttribute('data-kind-show').split(' ').indexOf(kindSelect.value) !== -1;
+          box.hidden = !on;
+        });
+      };
+      if (kindSelect) { kindSelect.addEventListener('change', showFor); showFor(); }
+    }
+
     // Copy buttons and select-on-focus for read-only URL fields
     document.addEventListener('click', function (e) {
       var btn = e.target.closest && e.target.closest('[data-copy]');

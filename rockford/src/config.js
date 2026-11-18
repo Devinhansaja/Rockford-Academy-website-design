@@ -59,6 +59,7 @@ module.exports = {
   secret,
   cvMaxBytes: Math.round(num('CV_MAX_MB', 5) * 1024 * 1024),
   imageMaxBytes: Math.round(num('IMAGE_MAX_MB', 4) * 1024 * 1024),
+  flyerMaxBytes: Math.round(num('FLYER_MAX_MB', 8) * 1024 * 1024), // job flyers (image or PDF)
   mail: {
     transport: env('MAIL_TRANSPORT', 'outbox'), // 'outbox' (no delivery, saved to storage/outbox) | 'smtp'
     from: env('MAIL_FROM', ''),

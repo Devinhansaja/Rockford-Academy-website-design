@@ -9,6 +9,7 @@ const NAV = [
   { key: 'pages', label: 'Website Pages', href: '/admin/pages', area: 'content' },
   { key: 'programmes', label: 'Programmes', href: '/admin/programmes', area: 'content' },
   { key: 'vacancies', label: 'Vacancies', href: '/admin/vacancies', area: 'recruitment' },
+  { key: 'flyers', label: 'Job Flyers', href: '/admin/flyers', area: 'recruitment' },
   { key: 'applications', label: 'Applications', href: '/admin/applications', area: 'recruitment' },
   { key: 'enquiries', label: 'Enquiries', href: '/admin/enquiries', area: 'enquiries' },
   { key: 'articles', label: 'News & Articles', href: '/admin/articles', area: 'content' },

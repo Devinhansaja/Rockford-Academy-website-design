@@ -118,6 +118,7 @@ const MIME = {
   '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml',
   '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.avif': 'image/avif',
   '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8', '.json': 'application/json',
+  '.pdf': 'application/pdf',
 };
 
 /** Serve a file from /public. Returns true if handled. Never serves dotfiles or escapes the folder. */
@@ -140,6 +141,7 @@ function serveStatic(req, res, urlPath) {
     'Cache-Control': urlPath.startsWith('/uploads/') ? 'public, max-age=2592000' : (config.isProd ? 'public, max-age=86400' : 'no-cache'),
     'X-Content-Type-Options': 'nosniff',
   };
+  if (type === MIME['.pdf']) headers['Content-Disposition'] = 'inline'; // open in the browser's PDF viewer
   if (req.headers['if-none-match'] === etag) { res.writeHead(304, headers); res.end(); return true; }
   res.writeHead(200, headers);
   if (req.method === 'HEAD') { res.end(); return true; }

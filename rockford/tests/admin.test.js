@@ -311,6 +311,183 @@ test('admin panel', async (t) => {
     for (const dir of [path.dirname(file), path.dirname(path.dirname(file))]) { try { fs.rmdirSync(dir); } catch { /* not empty */ } }
   });
 
+  await t.test('job flyers: image, PDF and words-only flyers; validation; duplicates; publish; delete', async () => {
+    const pub = new Client();
+    const flyerDir = path.join(ROOT, 'public', 'uploads', 'flyers');
+    const filesOnDisk = () => (fs.existsSync(flyerDir) ? fs.readdirSync(flyerDir, { recursive: true }).filter((f) => /\.(png|jpg|webp|pdf)$/.test(f)).length : 0);
+    const png = (n) => Buffer.concat([tinyPng(), Buffer.from(`variant-${n}`)]);
+    const pdf = (n) => Buffer.concat([tinyPdf(), Buffer.from(`% variant ${n}\n`)]);
+    const send = (url, fields, file) => {
+      const fd = new FormData();
+      fd.append('_csrf', admin.csrf);
+      for (const [k, v] of Object.entries(fields)) fd.append(k, v);
+      if (file) fd.append('file', new Blob([file.data], { type: file.type || 'application/octet-stream' }), file.name);
+      return admin.req('POST', url, { fd });
+    };
+    const publicHas = async (re) => re.test((await pub.get('/careers')).text);
+
+    let r = await admin.get('/admin/flyers');
+    assert.equal(r.status, 200);
+    assert.match(r.text, /No flyers yet/);
+    assert.match(r.text, /Job Flyers/);
+    assert.equal(await publicHas(/id="flyers"/), false, 'no flyer section while there are no flyers');
+    r = await admin.get('/admin/flyers/new');
+    assert.equal(r.status, 200);
+    assert.match(r.text, /data-flyer-form/);
+    assert.match(r.text, /Words only/);
+
+    /* 1. Image flyer */
+    r = await send('/admin/flyers/new', { kind: 'image', title: 'English Tutor – Colombo', summary: 'Join our teaching team', alt: 'Flyer: English tutor wanted in Colombo', status: 'published' }, { data: png(1), type: 'image/png', name: 'tutor.png' });
+    assert.equal(r.status, 303, r.text.slice(0, 500));
+    const img = row("SELECT * FROM flyers WHERE kind = 'image'");
+    assert.match(img.file, /^flyers\/\d{4}\/\d{2}\/[0-9a-f-]{36}\.png$/);
+    assert.equal(img.mime, 'image/png');
+    assert.equal(img.status, 'published');
+    assert.ok(img.published_at);
+    assert.ok(fs.existsSync(path.join(ROOT, 'public', 'uploads', img.file)));
+    r = await pub.get(`/uploads/${img.file}`);
+    assert.equal(r.status, 200);
+    assert.equal(r.headers.get('content-type'), 'image/png');
+
+    /* 2. PDF flyer */
+    r = await send('/admin/flyers/new', { kind: 'pdf', title: 'Receptionist vacancy', summary: 'Front desk role', status: 'published' }, { data: pdf(1), type: 'application/pdf', name: 'reception.pdf' });
+    assert.equal(r.status, 303, r.text.slice(0, 500));
+    const pdfRow = row("SELECT * FROM flyers WHERE kind = 'pdf'");
+    assert.match(pdfRow.file, /\.pdf$/);
+    assert.equal(pdfRow.original_name, 'reception.pdf');
+    r = await pub.get(`/uploads/${pdfRow.file}`);
+    assert.equal(r.status, 200);
+    assert.equal(r.headers.get('content-type'), 'application/pdf');
+    assert.match(r.headers.get('content-disposition'), /inline/);
+    assert.equal(r.headers.get('x-content-type-options'), 'nosniff');
+    assert.ok(r.buf.slice(0, 5).toString() === '%PDF-');
+
+    /* 3. Words-only flyer (markdown text; HTML must be escaped) */
+    r = await send('/admin/flyers/new', { kind: 'text', title: 'Visiting Lecturer Wanted', summary: 'Part-time', body: '## Duties\n\n- Teach spoken English\n- Run workshops\n\nSend your CV to <script>alert(1)</script> careers.', status: 'published', sort: '5' });
+    assert.equal(r.status, 303, r.text.slice(0, 500));
+    const txt = row("SELECT * FROM flyers WHERE kind = 'text'");
+    assert.equal(txt.file, '');
+    assert.equal(txt.sort, 5);
+    assert.equal(filesOnDisk(), 2, 'a words-only flyer stores no file');
+
+    /* Public Careers page shows all three types */
+    const careers = (await pub.get('/careers')).text;
+    assert.match(careers, /id="flyers"/);
+    assert.ok(careers.includes(`src="/uploads/${img.file}"`));
+    assert.ok(careers.includes('alt="Flyer: English tutor wanted in Colombo"'));
+    assert.ok(careers.includes('English Tutor – Colombo'));
+    assert.match(careers, /Open PDF/);
+    assert.ok(careers.includes(`href="/uploads/${pdfRow.file}"`));
+    assert.match(careers, /<li>Teach spoken English<\/li>/);
+    assert.doesNotMatch(careers, /<script>alert\(1\)<\/script>/);
+    assert.ok(careers.indexOf('Visiting Lecturer Wanted') > careers.indexOf('Receptionist vacancy'), 'sort order: text flyer (5) comes after the others (0)');
+
+    /* Admin list + dashboard */
+    r = await admin.get('/admin/flyers');
+    assert.match(r.text, /English Tutor – Colombo/);
+    assert.match(r.text, /Receptionist vacancy/);
+    assert.match(r.text, /Visiting Lecturer Wanted/);
+    assert.match((await admin.get('/admin')).text, /Published job flyers/);
+    r = await admin.get(`/admin/flyers/${img.id}`);
+    assert.equal(r.status, 200);
+    assert.match(r.text, /Current file/);
+
+    /* Validation */
+    const before = row('SELECT COUNT(*) AS n FROM flyers').n;
+    const bad = async (fields, file, status, re, label) => {
+      const x = await send('/admin/flyers/new', { status: 'draft', ...fields }, file);
+      assert.equal(x.status, status, `${label}: ${x.text.slice(0, 200)}`);
+      assert.match(x.text, re, label);
+    };
+    await bad({ kind: 'pdf', title: 'PNG pretending to be PDF' }, { data: png(2), type: 'application/pdf', name: 'x.pdf' }, 422, /not a PDF/, 'PNG as PDF');
+    await bad({ kind: 'image', title: 'PDF pretending to be image', alt: 'x' }, { data: pdf(2), type: 'image/png', name: 'x.png' }, 422, /not a JPG, PNG or WebP/, 'PDF as image');
+    await bad({ kind: 'image', title: 'Fake SVG', alt: 'x' }, { data: Buffer.from('<svg onload=alert(1)>'), type: 'image/png', name: 'evil.png' }, 422, /not a JPG, PNG or WebP/, 'fake image');
+    await bad({ kind: 'pdf', title: 'Wrong extension' }, { data: pdf(3), type: 'application/pdf', name: 'x.txt' }, 422, /not a PDF/, 'PDF with wrong extension');
+    await bad({ kind: 'image', title: 'No file', alt: 'x' }, null, 422, /Choose an image to upload/, 'image without file');
+    await bad({ kind: 'pdf', title: 'No file either' }, null, 422, /Choose a PDF to upload/, 'pdf without file');
+    await bad({ kind: 'image', title: 'No alt text' }, { data: png(3), type: 'image/png', name: 'a.png' }, 422, /alt text/i, 'image without alt');
+    await bad({ kind: 'text', title: 'Empty words' }, null, 422, /Enter the flyer text/, 'text without body');
+    await bad({ kind: 'banner', title: 'Odd type' }, null, 422, /Choose a valid option/, 'unknown type');
+    await bad({ kind: 'text', title: '', body: 'x' }, null, 422, /Title is required/, 'missing title');
+    await bad({ kind: 'text', title: 'Bad date', body: 'x', deadline: '2026-13-45' }, null, 422, /valid date/, 'bad date');
+    await bad({ kind: 'image', title: 'Huge', alt: 'x' }, { data: Buffer.concat([tinyPng(), Buffer.alloc(9 * 1024 * 1024)]), type: 'image/png', name: 'huge.png' }, 413, /too large/, 'oversized file');
+
+    /* Duplicates are refused: same title (any capitalisation) or the exact same file */
+    await bad({ kind: 'text', title: 'visiting lecturer WANTED', body: 'again' }, null, 422, /already exists/, 'duplicate title');
+    await bad({ kind: 'image', title: 'Same picture, new title', alt: 'x' }, { data: png(1), type: 'image/png', name: 'copy.png' }, 422, /already uploaded as “English Tutor – Colombo”/, 'duplicate file');
+    assert.equal(row('SELECT COUNT(*) AS n FROM flyers').n, before, 'nothing was saved by the rejected submissions');
+    assert.equal(filesOnDisk(), 2, 'rejected uploads leave no files behind');
+
+    const noCsrf = new FormData(); noCsrf.append('kind', 'text'); noCsrf.append('title', 'No token'); noCsrf.append('body', 'x');
+    assert.equal((await admin.req('POST', '/admin/flyers/new', { fd: noCsrf })).status, 403);
+    assert.equal((await new Client().req('POST', '/admin/flyers/new', { fd: noCsrf })).status, 303, 'signed-out users are sent to log in');
+
+    /* Edit: title only keeps the file; switching type needs the right file and cleans up the old one */
+    r = await send(`/admin/flyers/${img.id}`, { kind: 'image', title: 'English Tutor (Colombo)', summary: 'Join our teaching team', alt: 'Flyer: English tutor wanted in Colombo', status: 'published' });
+    assert.equal(r.status, 303, r.text.slice(0, 400));
+    assert.equal(row('SELECT file FROM flyers WHERE id = ?', img.id).file, img.file, 'file kept when none is uploaded');
+    r = await send(`/admin/flyers/${img.id}`, { kind: 'pdf', title: 'English Tutor (Colombo)', status: 'published' });
+    assert.equal(r.status, 422);
+    assert.match(r.text, /Choose a PDF to upload/);
+    r = await send(`/admin/flyers/${img.id}`, { kind: 'pdf', title: 'English Tutor (Colombo)', status: 'published' }, { data: pdf(4), type: 'application/pdf', name: 'tutor.pdf' });
+    assert.equal(r.status, 303, r.text.slice(0, 400));
+    const nowPdf = row('SELECT * FROM flyers WHERE id = ?', img.id);
+    assert.equal(nowPdf.kind, 'pdf');
+    assert.notEqual(nowPdf.file, img.file);
+    assert.ok(fs.existsSync(path.join(ROOT, 'public', 'uploads', nowPdf.file)));
+    assert.ok(!fs.existsSync(path.join(ROOT, 'public', 'uploads', img.file)), 'old image deleted when replaced');
+    assert.equal(nowPdf.alt, '', 'alt text only belongs to image flyers');
+    r = await send(`/admin/flyers/${pdfRow.id}`, { kind: 'text', title: 'Receptionist vacancy', body: 'Now just words.', status: 'published' });
+    assert.equal(r.status, 303);
+    const nowText = row('SELECT * FROM flyers WHERE id = ?', pdfRow.id);
+    assert.equal(nowText.file, ''); assert.equal(nowText.size, 0);
+    assert.ok(!fs.existsSync(path.join(ROOT, 'public', 'uploads', pdfRow.file)), 'file deleted when a flyer becomes words-only');
+    assert.equal(filesOnDisk(), 1);
+
+    /* Closing date hides a flyer automatically; unpublish hides it; republish shows it */
+    r = await send(`/admin/flyers/${txt.id}`, { kind: 'text', title: 'Visiting Lecturer Wanted', body: 'x', status: 'published', deadline: '2020-01-01' });
+    assert.equal(r.status, 303);
+    assert.equal(await publicHas(/Visiting Lecturer Wanted/), false, 'expired flyer is hidden');
+    assert.match((await admin.get('/admin/flyers')).text, /Closing date passed/);
+    r = await send(`/admin/flyers/${txt.id}`, { kind: 'text', title: 'Visiting Lecturer Wanted', body: 'x', status: 'published', deadline: '2099-01-01' });
+    assert.equal(await publicHas(/Visiting Lecturer Wanted/), true, 'future closing date is shown');
+    await admin.get(`/admin/flyers/${txt.id}`);
+    r = await admin.post(`/admin/flyers/${txt.id}/status`, { status: 'draft' });
+    assert.equal(r.status, 303);
+    assert.equal(await publicHas(/Visiting Lecturer Wanted/), false, 'draft flyer is hidden');
+    r = await admin.post(`/admin/flyers/${txt.id}/status`, { status: 'published' });
+    assert.equal(await publicHas(/Visiting Lecturer Wanted/), true);
+    assert.equal((await admin.post(`/admin/flyers/${txt.id}/status`, { status: 'archived' })).status, 400);
+
+    /* Delete removes the row and its file */
+    const pdfFile = path.join(ROOT, 'public', 'uploads', nowPdf.file);
+    r = await admin.post(`/admin/flyers/${img.id}/delete`);
+    assert.equal(r.location, '/admin/flyers?deleted=1');
+    assert.equal(row('SELECT id FROM flyers WHERE id = ?', img.id), undefined);
+    assert.ok(!fs.existsSync(pdfFile), 'file removed with the flyer');
+    assert.equal((await pub.get(`/uploads/${nowPdf.file}`)).status, 404);
+    assert.equal((await admin.get(`/admin/flyers/${img.id}`)).status, 404);
+    for (const id of [pdfRow.id, txt.id]) await admin.post(`/admin/flyers/${id}/delete`);
+    assert.equal(row('SELECT COUNT(*) AS n FROM flyers').n, 0);
+    assert.equal(filesOnDisk(), 0);
+    try { fs.rmSync(flyerDir, { recursive: true, force: true }); } catch { /* ignore */ }
+  });
+
+  await t.test('duplicate titles are refused for programmes, vacancies and articles', async () => {
+    for (const [key, base] of [['programmes', { availability: 'coming_soon' }], ['vacancies', { employment_type: 'Full-time' }], ['articles', {}]]) {
+      let r = await admin.post(`/admin/${key}/new`, { title: 'Twin Title', status: 'draft', ...base });
+      assert.equal(r.status, 303, `${key}: ${r.text.slice(0, 200)}`);
+      r = await admin.post(`/admin/${key}/new`, { title: 'twin title', status: 'draft', ...base });
+      assert.equal(r.status, 422, key);
+      assert.match(r.text, /already has this title/, key);
+      assert.equal(row(`SELECT COUNT(*) AS n FROM ${key} WHERE lower(title) = 'twin title'`).n, 1, key);
+      const id = row(`SELECT id FROM ${key} WHERE title = 'Twin Title'`).id;
+      r = await admin.post(`/admin/${key}/${id}`, { title: 'Twin Title', status: 'draft', ...base });
+      assert.equal(r.status, 303, `${key}: editing an item may keep its own title`);
+      await admin.post(`/admin/${key}/${id}/delete`);
+    }
+  });
+
   await t.test('settings: save, validation errors, unknown keys ignored', async () => {
     let r = await admin.post('/admin/settings/brand', { site_name: 'Rockford Academy', tagline: 'Hello <world>', logo_url: '', evil_key: 'x' });
     assert.equal(r.location, '/admin/settings/brand?saved=1');
@@ -359,7 +536,7 @@ test('admin panel', async (t) => {
     assert.equal(r.status, 303);
 
     const im = settingsDefaults.images; const img = {};
-    for (const k of ['hero', 'journey1', 'journey2', 'journey3', 'difference', 'programmes', 'about', 'approach', 'careers']) {
+    for (const k of ['hero', 'journey1', 'journey2', 'journey3', 'programmes', 'about', 'approach', 'careers']) {
       img[`img_${k}_src`] = im[k].src; img[`img_${k}_alt`] = im[k].alt; if (k !== 'hero') img[`img_${k}_stock`] = '1';
     }
     im.gallery.forEach((g, i) => { img[`gal_${i}_label`] = g.label; img[`gal_${i}_src`] = g.src; img[`gal_${i}_alt`] = g.alt; img[`gal_${i}_stock`] = '1'; });
@@ -396,7 +573,7 @@ test('admin panel', async (t) => {
     const dash = await admin.get('/admin');
     assert.doesNotMatch(dash.text, /Legal pages are still drafts/);
     assert.doesNotMatch(dash.text, /No contact details/);
-    assert.match(dash.text, /12 temporary stock photos/);
+    assert.match(dash.text, /11 temporary stock photos/);
   });
 
   let editorId; let recruiterId;
@@ -425,6 +602,8 @@ test('admin panel', async (t) => {
     assert.equal((await rec.get('/admin/users')).status, 403);
     assert.equal((await rec.get('/admin/applications')).status, 200);
     assert.equal((await rec.get('/admin/vacancies')).status, 200);
+    assert.equal((await rec.get('/admin/flyers')).status, 200, 'recruiters manage job flyers');
+    assert.equal((await rec.post('/admin/flyers/new', { kind: 'text', title: 'By recruiter', body: 'Words.', status: 'draft' })).status, 303);
     const recDash = await rec.get('/admin');
     assert.doesNotMatch(recDash.text, /Setup checklist/);
     assert.doesNotMatch(recDash.text, /href="\/admin\/programmes"/, 'nav hides programmes');
@@ -434,6 +613,8 @@ test('admin panel', async (t) => {
     assert.equal((await ed.login('editor@example.test', 'Editor pass 2026')).status, 303);
     assert.equal((await ed.get('/admin/applications')).status, 403);
     assert.equal((await ed.get('/admin/vacancies')).status, 403);
+    assert.equal((await ed.get('/admin/flyers')).status, 403, 'editors cannot manage job flyers');
+    assert.equal((await ed.post('/admin/flyers/new', { kind: 'text', title: 'By editor', body: 'x' })).status, 403);
     assert.equal((await ed.get('/admin/settings/brand')).status, 403);
     assert.equal((await ed.get('/admin/audit')).status, 403);
     assert.equal((await ed.get('/admin/programmes')).status, 200);

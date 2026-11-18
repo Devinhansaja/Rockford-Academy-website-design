@@ -15,6 +15,10 @@ module.exports = {
   vacancy: (slug) => q.get("SELECT * FROM vacancies WHERE status IN ('open','closed','archived') AND slug = ?", slug),
   vacancyIsOpen: (v) => !!v && v.status === 'open' && (!v.deadline || v.deadline >= todayColombo()),
 
+  /** Published job flyers whose closing date (if any) has not passed. */
+  flyers: () => q.all("SELECT * FROM flyers WHERE status = 'published' AND (deadline = '' OR deadline >= ?) ORDER BY sort ASC, COALESCE(published_at, created_at) DESC, id DESC", todayColombo()),
+  todayColombo,
+
   testimonials: () => q.all("SELECT * FROM testimonials WHERE status = 'published' AND consent_confirmed = 1 AND approved_by <> '' ORDER BY sort ASC, id DESC"),
 
   articles: (limit = 100) => q.all("SELECT * FROM articles WHERE status = 'published' AND published_at <= ? ORDER BY published_at DESC LIMIT ?", Date.now(), limit),

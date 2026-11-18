@@ -7,6 +7,22 @@ const { q } = require('./db');
 
 const U = (id) => `https://images.unsplash.com/photo-${id}`;
 
+// Each stock photo is defined once here (address + description) and reused below.
+const PHOTO = {
+  laptop: { src: U('1758270705317-3ef6142d306f'), alt: 'Students gathered around a laptop working on a task together' },
+  presenter: { src: U('1715610258704-e8f9f5710fe0'), alt: 'A young woman speaking into a microphone in front of an audience' },
+  workshop: { src: U('1682962232755-f1d051ddb638'), alt: 'A group of young people laughing around a wooden table' },
+  lecturer: { src: U('1758270705031-ebd46917a454'), alt: 'A lecturer guiding students in a modern classroom' },
+  campus: { src: U('1549057446-9f5c6ac91a04'), alt: 'Confident young adults walking together through a campus' },
+  classroom: { src: U('1571260899304-425eee4c7efc'), alt: 'A young woman holding textbooks in a bright classroom with other students' },
+  lectureHall: { src: U('1758270704763-22072a90d3b6'), alt: 'Students talking and laughing in a lecture hall' },
+  notes: { src: U('1686624386665-4cd01b96d0f6'), alt: 'Young men working together and writing notes at a table' },
+  board: { src: U('1712903911017-7c10a3c4b3e5'), alt: 'A young woman presenting ideas on a board to her group' },
+  meeting: { src: U('1637073849563-5b0ac780ec34'), alt: 'A presenter speaking to a small group in a meeting room' },
+  bench: { src: U('1517486808906-6ca8b3f04846'), alt: 'Friends sitting together on a bench outdoors, smiling' },
+};
+const stock = (p, extra = {}) => ({ ...p, ...extra, stock: true });
+
 const DEFAULTS = {
   // Brand
   site_name: 'Rockford Academy',
@@ -50,13 +66,7 @@ const DEFAULTS = {
   announcement_end: '',
 
   // Homepage hero slideshow: up to 5 full-screen photos, main subject on the right-hand side.
-  hero_slides: [
-    { src: U('1758270705317-3ef6142d306f'), alt: 'Young adults collaborating around a laptop', stock: true },
-    { src: U('1715610258704-e8f9f5710fe0'), alt: 'A confident young woman presenting to an audience', stock: true },
-    { src: U('1682962232755-f1d051ddb638'), alt: 'Young adults taking part in an interactive group workshop', stock: true },
-    { src: U('1758270705031-ebd46917a454'), alt: 'A lecturer guiding students in a modern classroom', stock: true },
-    { src: U('1549057446-9f5c6ac91a04'), alt: 'Confident young adults walking together through a campus', stock: true },
-  ],
+  hero_slides: [PHOTO.laptop, PHOTO.presenter, PHOTO.workshop, PHOTO.lecturer, PHOTO.campus].map((p) => stock(p)),
 
   // Homepage copy
   home_hero_eyebrow: 'A world of opportunity',
@@ -78,20 +88,19 @@ const DEFAULTS = {
 
   // Images. `stock: true` marks temporary licensed stock photos (shown with an "Illustrative photo" label).
   images: {
-    hero: { src: U('1571260899304-425eee4c7efc'), alt: 'A young woman holding textbooks in a bright classroom with other students', stock: true },
-    journey1: { src: U('1686624386665-4cd01b96d0f6'), alt: 'Young men working together and writing notes at a table', stock: true },
-    journey2: { src: U('1712903911017-7c10a3c4b3e5'), alt: 'A young woman presenting ideas on a board to her group', stock: true },
-    journey3: { src: U('1637073849563-5b0ac780ec34'), alt: 'A presenter speaking to a small group in a meeting room', stock: true },
-    difference: { src: U('1549057446-9f5c6ac91a04'), alt: 'A group of young adults walking and laughing together outdoors', stock: true },
-    programmes: { src: U('1517486808906-6ca8b3f04846'), alt: 'Friends sitting together on a bench outdoors, smiling', stock: true },
-    about: { src: U('1682962232755-f1d051ddb638'), alt: 'A group of young people laughing around a wooden table', stock: true },
-    approach: { src: U('1715610258704-e8f9f5710fe0'), alt: 'A young woman speaking into a microphone in front of an audience', stock: true },
-    careers: { src: U('1758270705317-3ef6142d306f'), alt: 'Students gathered around a laptop working on a task together', stock: true },
+    hero: stock(PHOTO.classroom),
+    journey1: stock(PHOTO.notes),
+    journey2: stock(PHOTO.board),
+    journey3: stock(PHOTO.meeting),
+    programmes: stock(PHOTO.bench),
+    about: stock(PHOTO.workshop),
+    approach: stock(PHOTO.presenter),
+    careers: stock(PHOTO.laptop),
     gallery: [
-      { label: 'Classrooms', src: U('1758270704763-22072a90d3b6'), alt: 'Students talking and laughing in a lecture hall', stock: true },
-      { label: 'Collaborative spaces', src: U('1682962232755-f1d051ddb638'), alt: 'A group of young people laughing around a wooden table', stock: true },
-      { label: 'Presentation studio', src: U('1715610258704-e8f9f5710fe0'), alt: 'A young woman speaking into a microphone in front of an audience', stock: true },
-      { label: 'Workshops', src: U('1758270705317-3ef6142d306f'), alt: 'Students gathered around a laptop working on a task together', stock: true },
+      stock(PHOTO.lectureHall, { label: 'Classrooms' }),
+      stock(PHOTO.classroom, { label: 'Study spaces' }),
+      stock(PHOTO.presenter, { label: 'Presentation studio' }),
+      stock(PHOTO.workshop, { label: 'Workshops' }),
     ],
   },
 

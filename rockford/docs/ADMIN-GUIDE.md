@@ -27,6 +27,17 @@ Sign in at **`https://<your-domain>/admin`**. You only see the sections your rol
 2. Set **Status → Open**. The role appears on the homepage and Careers page, with an online application form.
 3. After the closing date the form closes automatically. Use **Close** or **Archive** to take it down sooner.
 
+### Add a job flyer
+Job flyers appear in a **Job flyers** section on the Careers page. Admins and recruiters can manage them under *Job Flyers*.
+1. *Job Flyers → Add flyer* and choose the type:
+   - **Image**: upload the finished flyer (JPG, PNG or WebP). Add alt text that says what the flyer says.
+   - **PDF**: upload a PDF. Visitors can open or download it.
+   - **Words only**: type the job details (basic formatting is supported) and the website lays them out.
+2. Add a title and an optional short description. Optionally set a **closing date**; the flyer is hidden automatically after it.
+3. Set **Status → Published** to show it. **Unpublish** takes it down without deleting it; **Delete** also removes the uploaded file.
+4. Duplicates are blocked: you cannot add two flyers with the same title, or upload the same file twice. Edit the existing flyer instead.
+5. Files can be up to 8 MB (`FLYER_MAX_MB`). Use *Sort order* to control the order (lower first).
+
 ### Review applications
 1. *Applications* lists the newest first. Search by name, email, position or reference, and filter by vacancy or status.
 2. Open an application to read it, **download the CV**, set the status (Received → Reviewing → Shortlisted / Unsuccessful / Hired) and add internal notes.

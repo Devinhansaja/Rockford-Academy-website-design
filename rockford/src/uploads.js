@@ -82,4 +82,43 @@ function deleteImage(rel) {
   try { fs.unlinkSync(path.join(config.UPLOADS_DIR, rel)); } catch { /* already gone */ }
 }
 
-module.exports = { validateCv, saveCv, cvPath, deleteCv, validateImage, saveImage, deleteImage, detectCv, detectImage };
+/* ── Job flyers: an image (JPG/PNG/WebP) or a PDF, stored under public/uploads/flyers/YYYY/MM ── */
+const FLYER_REL = /^flyers\/\d{4}\/\d{2}\/[0-9a-f-]{36}\.(jpg|png|webp|pdf)$/;
+const flyerUrl = (rel) => (FLYER_REL.test(String(rel)) ? `/uploads/${rel}` : '');
+
+function detectPdf(buf) {
+  return buf.slice(0, 5).toString('latin1') === '%PDF-' ? { ext: '.pdf', mime: 'application/pdf' } : null;
+}
+
+/** kind is 'image' or 'pdf'. Returns { error } or { ok, kind: {ext, mime}, sha256 }. */
+function validateFlyerFile(file, kind) {
+  const label = kind === 'pdf' ? 'a PDF' : 'an image (JPG, PNG or WebP)';
+  if (!file || !file.data || !file.data.length) return { error: `Choose ${label} to upload.` };
+  if (file.data.length > config.flyerMaxBytes) return { error: `The file is too large. Flyers must be ${Math.round(config.flyerMaxBytes / 1048576)} MB or smaller.` };
+  const found = kind === 'pdf' ? detectPdf(file.data) : detectImage(file.data);
+  if (!found || (kind === 'pdf' && path.extname(file.filename || '').toLowerCase() !== '.pdf')) {
+    return { error: kind === 'pdf' ? 'That file is not a PDF. Choose a .pdf file, or change the flyer type.' : 'That file is not a JPG, PNG or WebP image. Choose an image, or change the flyer type.' };
+  }
+  return { ok: true, kind: found, sha256: crypto.createHash('sha256').update(file.data).digest('hex') };
+}
+
+function saveFlyerFile(file, kind) {
+  const d = new Date();
+  const sub = `flyers/${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+  fs.mkdirSync(path.join(config.UPLOADS_DIR, sub), { recursive: true });
+  const rel = `${sub}/${crypto.randomUUID()}${kind.ext}`;
+  fs.writeFileSync(path.join(config.UPLOADS_DIR, rel), file.data);
+  return { file: rel, mime: kind.mime, size: file.data.length };
+}
+
+function deleteFlyerFile(rel) {
+  if (!FLYER_REL.test(String(rel))) return;
+  const p = path.join(config.UPLOADS_DIR, rel);
+  try { fs.unlinkSync(p); } catch { return; /* already gone */ }
+  for (const dir of [path.dirname(p), path.dirname(path.dirname(p))]) { try { fs.rmdirSync(dir); } catch { break; /* not empty */ } }
+}
+
+module.exports = {
+  validateCv, saveCv, cvPath, deleteCv, validateImage, saveImage, deleteImage, detectCv, detectImage,
+  detectPdf, validateFlyerFile, saveFlyerFile, deleteFlyerFile, flyerUrl,
+};

@@ -4,7 +4,7 @@ const config = require('../config');
 const { h, safeUrl } = require('../security');
 const md = require('../markdown');
 const { pageHero } = require('./layout');
-const { photo, pill, programmeCard, vacancyCard, articleCard, formatDate, field, antiSpam, errorSummary, AVAILABILITY } = require('./components');
+const { photo, pill, programmeCard, vacancyCard, flyerCard, articleCard, formatDate, field, antiSpam, errorSummary, AVAILABILITY } = require('./components');
 const { DIMENSIONS, PRINCIPLES } = require('./home');
 
 const listItems = (arr) => (arr || []).filter(Boolean).map((x) => `<li>${h(x)}</li>`).join('');
@@ -215,7 +215,7 @@ function applicationFields(ctx, { values = {}, errors = {} }) {
     </div>`;
 }
 
-function careers(ctx, { vacancies, form }) {
+function careers(ctx, { vacancies, flyers = [], form }) {
   const s = ctx.settings; const img = s.images || {};
   return `${pageHero({ label: 'Careers · Join our team', title: s.home_careers_title, intro: s.home_careers_lede, photoHtml: photo(img.careers, { sizes: '100vw' }) })}
 
@@ -238,7 +238,12 @@ function careers(ctx, { vacancies, form }) {
   </div>
 </section>
 
-<section class="section-pad" id="apply"><div class="wrap two-col">
+${flyers.length ? `<section class="section-pad" id="flyers"><div class="wrap">
+    <div class="head-split"><h2 class="big-title reveal">Job flyers</h2><p class="caps-sub reveal">Current job announcements. Open a flyer to read the full details.</p></div>
+    <ul class="flyers">${flyers.map(flyerCard).join('')}</ul>
+  </div></section>
+
+` : ''}<section class="section-pad" id="apply"><div class="wrap two-col">
   <p class="tiny-label">How to apply</p>
   <ol class="apply-steps">
     <li class="reveal"><span>/01</span><div><h3>Choose a role</h3><p>Read the description, responsibilities and requirements carefully.</p></div></li>

@@ -22,6 +22,7 @@ const crudViews = require('../views/admin/crud');
 const inbox = require('../views/admin/inbox');
 const dashViews = require('../views/admin/dashboard');
 const mediaViews = require('../views/admin/media');
+const flyerViews = require('../views/admin/flyers');
 const settingsViews = require('../views/admin/settings');
 const userViews = require('../views/admin/users');
 
@@ -170,6 +171,7 @@ function register(app) {
     if (can(s, 'recruitment')) {
       counts.push({ label: 'New applications', value: n("SELECT COUNT(*) AS n FROM applications WHERE status = 'received'"), href: '/admin/applications?status=received' });
       counts.push({ label: 'Open vacancies', value: n("SELECT COUNT(*) AS n FROM vacancies WHERE status = 'open'"), href: '/admin/vacancies' });
+      counts.push({ label: 'Published job flyers', value: n("SELECT COUNT(*) AS n FROM flyers WHERE status = 'published'"), href: '/admin/flyers' });
     }
     if (can(s, 'enquiries')) counts.push({ label: 'New enquiries', value: n("SELECT COUNT(*) AS n FROM enquiries WHERE status = 'new'"), href: '/admin/enquiries?status=new' });
     if (can(s, 'content')) {
@@ -424,6 +426,108 @@ function register(app) {
     q.run('DELETE FROM applications WHERE id = ?', a.id);
     audit(ctx.session.user_id, 'application.delete', `${a.ref} (${a.position})`);
     ctx.redirect('/admin/applications?deleted=1');
+  });
+
+  /* ── Job flyers (image, PDF or typed words) ────────────────── */
+  const flyerMaxMb = Math.round(config.flyerMaxBytes / 1048576);
+  const FLYER_FIELDS = [
+    { name: 'kind', label: 'Flyer type', type: 'select', required: true, options: flyerViews.KINDS },
+    { name: 'title', label: 'Title', required: true, maxlength: 150 },
+    { name: 'summary', label: 'Short description', maxlength: 300 },
+    { name: 'body', label: 'Flyer text', maxlength: 20000 },
+    { name: 'alt', label: 'Image description', maxlength: 250 },
+    { name: 'deadline', label: 'Closing date', type: 'date' },
+    { name: 'status', label: 'Status', type: 'select', options: [['draft', 'Draft'], ['published', 'Published']] },
+    { name: 'sort', label: 'Sort order', type: 'number', min: -9999, max: 9999 },
+  ];
+  const flyerValues = (r) => ({ kind: r.kind, title: r.title, summary: r.summary, body: r.body, alt: r.alt, deadline: r.deadline, status: r.status, sort: String(r.sort) });
+  const flyerPage = (ctx, row, values, errors, status) => ctx.html(flyerViews.formPage(ctx, { row, values, errors, maxMb: flyerMaxMb }), status);
+  const flyerNew = { kind: 'image', status: 'draft', sort: '0' };
+
+  /** Parse the (large) multipart body so an oversized file gets a friendly message. */
+  const flyerBody = async (ctx) => {
+    try { await ctx.body({ limit: config.flyerMaxBytes + 64 * 1024 }); return true; } catch (e) {
+      if (e.status !== 413) throw e;
+      flyerPage(ctx, ctx.row || null, ctx.row ? flyerValues(ctx.row) : flyerNew, { file: `That file is too large. Flyers must be ${flyerMaxMb} MB or smaller.` }, 413);
+      return false;
+    }
+  };
+
+  async function saveFlyer(ctx, row) {
+    const { fields, files } = await ctx.body();
+    const f = {};
+    for (const fd of FLYER_FIELDS) f[fd.name] = schema.str(fields[fd.name]);
+    const errors = schema.validateFields(FLYER_FIELDS, f, {});
+    const upload = files.find((x) => x.field === 'file');
+    const selfId = row ? row.id : 0;
+    let check = null;
+    if (!errors.kind) {
+      if (f.kind === 'text') {
+        if (!f.body && !errors.body) errors.body = 'Enter the flyer text.';
+      } else {
+        if (f.kind === 'image' && !f.alt && !errors.alt) errors.alt = 'Describe the image (alt text) so it is accessible.';
+        if (upload) { check = uploads.validateFlyerFile(upload, f.kind); if (check.error) errors.file = check.error; }
+        else if (!(row && row.kind === f.kind && row.file)) errors.file = f.kind === 'pdf' ? 'Choose a PDF to upload.' : 'Choose an image to upload.';
+      }
+    }
+    // Duplicate protection: same title, or the exact same file, cannot be added twice.
+    if (!errors.title && q.get('SELECT id FROM flyers WHERE lower(title) = lower(?) AND id != ?', f.title, selfId)) {
+      errors.title = 'A flyer with this title already exists. Edit that one, or choose a different title.';
+    }
+    if (check && check.ok) {
+      const dup = q.get('SELECT title FROM flyers WHERE sha256 = ? AND id != ?', check.sha256, selfId);
+      if (dup) errors.file = `This exact file is already uploaded as “${dup.title}”. Edit that flyer instead of adding it twice.`;
+    }
+    if (hasErrors(errors)) return flyerPage(ctx, row, f, errors, 422);
+
+    const data = {
+      title: f.title, kind: f.kind, summary: f.summary, body: f.kind === 'text' ? f.body : '', alt: f.kind === 'image' ? f.alt : '',
+      deadline: f.deadline, status: f.status || 'draft', sort: Number(f.sort || 0),
+    };
+    let replaced = false;
+    if (check && check.ok) {
+      const saved = uploads.saveFlyerFile(upload, check.kind);
+      Object.assign(data, { file: saved.file, mime: saved.mime, size: saved.size, sha256: check.sha256, original_name: String(upload.filename || 'flyer').replace(/[^\w .()-]+/g, '_').slice(0, 200) });
+      replaced = true;
+    } else if (f.kind === 'text') {
+      Object.assign(data, { file: '', mime: '', size: 0, sha256: '', original_name: '' });
+      replaced = true;
+    }
+    if (data.status === 'published' && !(row && row.published_at)) data.published_at = now();
+    data.updated_at = now();
+    const cols = Object.keys(data);
+    let id;
+    if (row) {
+      q.run(`UPDATE flyers SET ${cols.map((c) => `${c} = ?`).join(', ')} WHERE id = ?`, ...cols.map((c) => data[c]), row.id);
+      id = row.id;
+      if (replaced && row.file) uploads.deleteFlyerFile(row.file);
+    } else {
+      data.created_at = data.updated_at; cols.push('created_at');
+      id = Number(q.run(`INSERT INTO flyers (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`, ...cols.map((c) => data[c])).lastInsertRowid);
+    }
+    audit(ctx.session.user_id, `flyers.${row ? 'update' : 'create'}`, `#${id} “${data.title}” (${data.kind}, ${data.status})`);
+    ctx.redirect(`/admin/flyers/${id}?${row ? 'saved' : 'created'}=1`);
+  }
+
+  get('/admin/flyers', recruit, (ctx) => ctx.html(flyerViews.listPage(ctx, { rows: q.all("SELECT * FROM flyers ORDER BY CASE status WHEN 'published' THEN 0 ELSE 1 END, sort, updated_at DESC") })));
+  get('/admin/flyers/new', recruit, (ctx) => flyerPage(ctx, null, { ...flyerNew }, {}));
+  post('/admin/flyers/new', recruit, flyerBody, csrf, (ctx) => saveFlyer(ctx, null));
+  get('/admin/flyers/:id', recruit, loadRow('flyers'), (ctx) => flyerPage(ctx, ctx.row, flyerValues(ctx.row), {}));
+  post('/admin/flyers/:id', recruit, loadRow('flyers'), flyerBody, csrf, (ctx) => saveFlyer(ctx, ctx.row));
+  post('/admin/flyers/:id/status', recruit, csrf, loadRow('flyers'), async (ctx) => {
+    const r = ctx.row; const to = schema.str((await fieldsOf(ctx)).status);
+    if (!['draft', 'published'].includes(to)) return ctx.text('Unknown status', 400);
+    q.run('UPDATE flyers SET status = ?, published_at = COALESCE(published_at, ?), updated_at = ? WHERE id = ?', to, to === 'published' ? now() : null, now(), r.id);
+    audit(ctx.session.user_id, 'flyers.status', `#${r.id} “${r.title}” ${r.status} → ${to}`);
+    const back = ctx.req.headers.referer && /\/admin\/flyers\/\d+$/.test(new URL(ctx.req.headers.referer, 'http://x').pathname) ? `/admin/flyers/${r.id}` : '/admin/flyers';
+    ctx.redirect(`${back}?status=1`);
+  });
+  post('/admin/flyers/:id/delete', recruit, csrf, loadRow('flyers'), (ctx) => {
+    const r = ctx.row;
+    q.run('DELETE FROM flyers WHERE id = ?', r.id);
+    uploads.deleteFlyerFile(r.file);
+    audit(ctx.session.user_id, 'flyers.delete', `#${r.id} “${r.title}” (${r.kind})`);
+    ctx.redirect('/admin/flyers?deleted=1');
   });
 
   /* ── Enquiries ─────────────────────────────────────────────── */
