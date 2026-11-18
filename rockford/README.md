@@ -39,3 +39,10 @@ npm test                    # automated tests
 - [docs/SECURITY.md](docs/SECURITY.md): security and privacy controls
 - [docs/TESTING.md](docs/TESTING.md): test report
 - [docs/BRIEF-CHECKLIST.md](docs/BRIEF-CHECKLIST.md): every requirement in the client brief, its status, platform rationale and future-expansion plan
+
+## Docker / Coolify
+
+`Dockerfile` (in this folder) builds a production image; set the build context / base directory to `rockford/`.
+Mount persistent volumes at `/app/storage` (database, CVs, backups) and `/app/public/uploads` (images, flyers),
+and set `SESSION_SECRET` and `SITE_URL`. Create the first admin inside the container with
+`node scripts/create-admin.js --name "…" --email … --password "…"`.

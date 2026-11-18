@@ -1,0 +1,12 @@
+.env
+storage/
+storage-*/
+public/uploads/*
+!public/uploads/.gitkeep
+node_modules/
+dist/
+.vercel/
+tests/
+*.log
+Dockerfile
+.dockerignore
