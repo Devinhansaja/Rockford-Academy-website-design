@@ -14,14 +14,14 @@ const abs = (p) => (config.siteUrl ? config.siteUrl + p : '');
 function logo(s) {
   const lu = safeUrl(s.logo_url);
   if (lu) return `<img class="logo__img" src="${h(lu)}" alt="${h(s.site_name)}">`;
-  return `<img class="logo__head" src="/assets/brand/rockford-logo.webp" width="640" height="711" alt="${h(s.site_name)}: English Academy">`;
+  return `<img class="logo__head" src="/assets/brand/rockford-logo.webp?v=2" width="640" height="783" alt="${h(s.site_name)}: English Academy">`;
 }
 
 /** Footer logo: the full crest with wordmark, banner and "Est. 2026". */
 function fullLogo(s) {
   const lu = safeUrl(s.logo_url);
   if (lu) return `<img class="logo__img" src="${h(lu)}" alt="${h(s.site_name)}">`;
-  return `<img class="logo__full" src="/assets/brand/rockford-logo.webp" width="640" height="711" alt="${h(s.site_name)}: English Academy, established 2026" loading="lazy">`;
+  return `<img class="logo__full" src="/assets/brand/rockford-logo.webp?v=2" width="640" height="783" alt="${h(s.site_name)}: English Academy, established 2026" loading="lazy">`;
 }
 
 function analyticsHead(ctx) {
@@ -137,13 +137,13 @@ ${canonical ? `<meta property="og:url" content="${h(canonical)}">` : ''}
 ${ogAbs ? `<meta property="og:image" content="${h(ogAbs)}">` : ''}
 <meta name="twitter:card" content="${ogAbs ? 'summary_large_image' : 'summary'}">
 ${s.search_console_verification ? `<meta name="google-site-verification" content="${h(s.search_console_verification)}">` : ''}
-<link rel="icon" href="/assets/brand/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/brand/favicon-32.png?v=2" sizes="32x32" type="image/png">
 <link rel="icon" href="/assets/brand/icon-192.png" sizes="192x192" type="image/png">
-<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@300;400;500;600&family=Instrument+Serif&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/main.css?v=12">
+<link rel="stylesheet" href="/assets/css/main.css?v=13">
 ${introScript}
 ${analyticsHead(ctx)}
 ${ld}
