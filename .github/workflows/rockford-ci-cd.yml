@@ -1,0 +1,72 @@
+# Rockford Academy CI/CD
+# - Every push and pull request: run the test suite and check the Docker image builds.
+# - Push to main (after tests pass): deploy to the Contabo server through Coolify, wait for it, then check the live site.
+# Needs the repository secret COOLIFY_TOKEN (a Coolify API token with only the "deploy" and "read" abilities).
+
+name: Rockford CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths: ["rockford/**", ".github/workflows/rockford-ci-cd.yml"]
+  pull_request:
+    branches: [main]
+    paths: ["rockford/**", ".github/workflows/rockford-ci-cd.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: rockford-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  COOLIFY_URL: https://coolify.glomaint.com
+  COOLIFY_APP_UUID: poxzwczmsbqrguklxqciqqmc
+  SITE_URL: https://rockfordedu.com
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rockford
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Run tests
+        run: npm test
+      - name: Check the Docker image builds
+        run: docker build -t rockford-ci .
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy through Coolify
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$COOLIFY_TOKEN" ]; then echo "::error::Repository secret COOLIFY_TOKEN is not set"; exit 1; fi
+          api() { curl -fsS --retry 3 -H "Authorization: Bearer $COOLIFY_TOKEN" -H "Content-Type: application/json" "$@"; }
+          DEP=$(api -X POST "$COOLIFY_URL/api/v1/deploy" -d "{\"uuid\":\"$COOLIFY_APP_UUID\"}" | jq -r '.deployments[0].deployment_uuid')
+          echo "Coolify deployment $DEP queued"
+          for _ in $(seq 1 60); do
+            STATUS=$(api "$COOLIFY_URL/api/v1/deployments/$DEP" | jq -r '.status')
+            echo "status: $STATUS"
+            case "$STATUS" in
+              finished) break ;;
+              failed|cancelled*) echo "::error::Deployment $STATUS - see the Coolify dashboard"; exit 1 ;;
+            esac
+            sleep 10
+          done
+          [ "$STATUS" = finished ] || { echo "::error::Deployment did not finish in 10 minutes"; exit 1; }
+      - name: Check the live site
+        run: |
+          for path in / /careers /contact /admin/login; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --retry 3 "$SITE_URL$path")
+            echo "$path $code"
+            [ "$code" = 200 ] || { echo "::error::$SITE_URL$path returned $code"; exit 1; }
+          done

@@ -46,3 +46,9 @@ npm test                    # automated tests
 Mount persistent volumes at `/app/storage` (database, CVs, backups) and `/app/public/uploads` (images, flyers),
 and set `SESSION_SECRET` and `SITE_URL`. Create the first admin inside the container with
 `node scripts/create-admin.js --name "…" --email … --password "…"`.
+
+### CI/CD
+
+`.github/workflows/rockford-ci-cd.yml` runs the tests and a Docker build on every push and pull request.
+A push to `main` that passes deploys through Coolify and then checks the live site. It needs the repository
+secret `COOLIFY_TOKEN` (a Coolify API token limited to the "deploy" and "read" abilities).
